@@ -1,0 +1,32 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --inspect index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LePhanQuocVu/Back-end_DATN.git"
+  },
+  "keywords": [
+    "do",
+    "an",
+    "nodejs",
+    "doan"
+  ],
+  "author": "quoc vu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LePhanQuocVu/Back-end_DATN/issues"
+  },
+  "homepage": "https://github.com/LePhanQuocVu/Back-end_DATN#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
