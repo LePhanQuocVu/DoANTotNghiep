@@ -69,6 +69,8 @@ app.use(express.json());
 
 // Setup routes
 app.use('/', authRouter);
+
+// test socket IO
 app.use('/', (req, res) => {
   res.send('<h1>Test Socket.IO server</h1>');
 });
