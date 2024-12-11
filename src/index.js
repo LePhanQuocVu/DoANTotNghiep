@@ -20,7 +20,7 @@ const io = new Server(server);
 io.on('connection', (socket) => {
   console.log('a user connected');
 });
-
+//
 // MQTT Broker configuration
 const mqttInfor = {
   host: '89ffa4ed74ef4736ba72d21bf3de00ab.s1.eu.hivemq.cloud',
