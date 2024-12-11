@@ -13,7 +13,7 @@ var app = express();
 const { Server } = require("socket.io");
 const { createServer } = require('node:http');
 const server = createServer(app);  // Đảm bảo server được tạo sau khi app
-
+// Socket IO
 const io = new Server(server);
 
 // Đảm bảo kết nối socket.io đúng
