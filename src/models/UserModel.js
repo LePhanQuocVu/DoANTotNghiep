@@ -6,7 +6,9 @@ const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, require: true},
-    age: { type: Number, required:  false },  
+    age: { type: Number, default: null },  
+    phone: {type: String,  default: null },
+    address: {type: String,  default: null},
 });
 
 const User = mongoose.model('users', userSchema);

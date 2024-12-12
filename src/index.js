@@ -1,8 +1,14 @@
 var express = require('express');
 var authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
+const waterRouter = require('./routes/water');
+
 const bodyParser = require('body-parser');
+
 const cors = require('cors');
 const db = require('./config/db');
+
+
 const mqtt = require('mqtt');
 const http = require('http');
 
@@ -12,6 +18,8 @@ var app = express();
 // Create an HTTP server
 const { Server } = require("socket.io");
 const { createServer } = require('node:http');
+
+
 const server = createServer(app);  // Đảm bảo server được tạo sau khi app
 // Socket IO
 const io = new Server(server);
@@ -69,11 +77,12 @@ app.use(express.json());
 
 // Setup routes
 app.use('/', authRouter);
-
+app.use('/', userRouter);
+app.use('/', waterRouter);
 // test socket IO
-app.use('/', (req, res) => {
-  res.send('<h1>Test Socket.IO server</h1>');
-});
+// app.use('/', (req, res) => {
+//   res.send('<h1>Test Socket.IO server</h1>');
+// });
 
 // Start the server
 const PORT = process.env.PORT || 3000;
