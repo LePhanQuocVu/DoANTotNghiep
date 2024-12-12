@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
 import 'package:water_meter_app/views/BLE_Connect/scan_device_page.dart';
 import 'package:water_meter_app/views/batery_page.dart';
+import 'package:water_meter_app/views/chart_history.dart';
 import 'package:water_meter_app/views/history_page.dart';
 import 'package:water_meter_app/views/notification_page.dart';
 import 'package:water_meter_app/views/profile_page.dart';
@@ -40,8 +41,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
       "icon": Icons.history,
     },
     {
-      "title": "Cài đặt",
-      "icon": Icons.settings,
+      "title": "Thông tin",
+      "icon": Icons.punch_clock_outlined,
     },
     {
       "title": "Dung lượng Pin",
@@ -51,7 +52,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   final List<Widget> _pages = [
       const ScanDevicePage(),
-      const HistoryPage(),
+      const ChartHistory(),
       const SettingPage(),
       const BateryPage(),
   ];
@@ -190,10 +191,26 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           onTap: (){
                             setState(() {
                               _currentIndex = index;
-                              Navigator.push(
+                              if(index == 0) {
+                                Navigator.push(
                                 context, 
                                 MaterialPageRoute(
                                   builder: (context) => const ScanDevicePage()));
+                              } else if(index == 1) {
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                              }
+                              else if(index == 2) {
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                              }
+                              else if(index == 3) {
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                              }
                             });
                           },
                           child: Card(

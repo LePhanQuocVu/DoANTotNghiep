@@ -81,7 +81,6 @@ class _HomePageState extends State<HomePage> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
-       
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {

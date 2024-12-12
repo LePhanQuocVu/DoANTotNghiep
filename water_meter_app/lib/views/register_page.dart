@@ -60,10 +60,9 @@ class RegisterPage extends StatelessWidget {
                 validator: (String? value) {
                   if(value == null || value.isEmpty){
                     return "Vui lòng nhập tên!";
-                  }else if(value == ""){
-
+                  }else {
+                    return null;
                   }
-                  return null;
                 },
               ),
               const SizedBox(height: 10,),
@@ -83,10 +82,9 @@ class RegisterPage extends StatelessWidget {
                 validator: (String? value) {
                   if(value == null || value.isEmpty){
                     return "Vui lòng nhập email!";
-                  }else if(value == ""){
-
+                  }else {
+                    return null;
                   }
-                  return null;
                 },
               ),
               const SizedBox(height: 10,),

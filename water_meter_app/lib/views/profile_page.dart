@@ -11,6 +11,16 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Column(
+      children: [
+        Row(
+          children: [
+            Container(
+              child: Text('Thông tin'),
+            )
+          ],
+        )
+      ],
+    );
   }
 }
