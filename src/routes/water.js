@@ -1,10 +1,9 @@
 var express  = require('express');
-var router = express.Router();
+var waterRouter = express.Router();
 
-var waterController = require('../controllers/WaterController');
-
-
-router.use('/', waterController.getData);
+var Water = require('../controllers/WaterController');
 
 
-module.exports = router;
+waterRouter.put('/api/water/update/:id', Water.updateDevice);
+
+module.exports = waterRouter;
