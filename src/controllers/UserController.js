@@ -55,7 +55,8 @@ class UserController {
             });
             // save user
             user = await user.save();
-            res.json(user);
+            return res.status(200).json(user);
+            // res.json(user);
         } catch(e) {
             res.status(500).json({error: e.message});
         }

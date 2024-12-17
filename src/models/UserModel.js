@@ -9,6 +9,7 @@ const userSchema = new Schema({
     age: { type: Number, default: null },  
     phone: {type: String,  default: null },
     address: {type: String,  default: null},
+    create_at: {type: Date, default: Date.now}
 });
 
 const User = mongoose.model('users', userSchema);
