@@ -19,15 +19,15 @@ class WaterController {
     // }
     createDevice = async(req, res) => {
         try{
-            const {user_id, type, location, status} = req.body;
+            const {user_id, deviceType, location, status} = req.body;
             if(!user_id) {
                 return res.status(400).json({msg: "Bad Request, User_id required"});
             }
             // create waterDevice
             const newDevice = new WaterMeter({
-                deviceType: type, // loại đồng hồ
+                deviceType: deviceType, // loại đồng hồ
                 user_id: user_id, // Lấy user_id từ req.body
-                location: location, // Optional
+                location: location, //location
                 status: status || false, // Default là false
             });
 
@@ -39,12 +39,32 @@ class WaterController {
             return res.status(500).json({msg: "Error from Server"});
         }
     } 
+    getDeviceByUserId = async(req, res) => {
+        try{
+            const user_id = req.params.id;
+            console.log(req.params);
+            console.log(user_id);
+            if(!user_id) {
+                return res.status(400).json({msg: "Người dùng chưa cài đặt!"})
+            }
+            const device = await WaterMeter.find({user_id: user_id});
+            console.log(device);
+            if(!device) {
+                return res.status(400).json({msg: "Error"});
+            }
+            return res.status(200).json(device);
+
+        }
+        catch(e) {
+            console.log(e);
+        }
+    }
 
     updateDevice = async(req, res) => {
         try {
             const deviceId = req.params.id;
             console.log(deviceId);
-            const {type, location, status} = req.body;
+            const {deviceType, location, status} = req.body;
            
             const device =  await WaterMeter.findById(deviceId);
             if(!device) {
@@ -52,7 +72,7 @@ class WaterController {
             }
 
             //update information
-            device.deviceType = type || device.deviceType;
+            device.deviceType = deviceType || device.deviceType;
             device.status = status || device.status;
             device.location = location || device.location;
             device.status = status || device.status;
