@@ -33,6 +33,9 @@ class WaterController {
 
             const waterDevice = await newDevice.save();
             
+            if(!waterDevice) {
+                return res.status(400).json({msg: "Không thể tạo thiết bị!"});
+            }
             return res.status(200).json(waterDevice);
         } catch(e) {
             console.log(e);
