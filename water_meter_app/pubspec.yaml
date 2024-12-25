@@ -15,6 +15,7 @@ dependencies:
   permission_handler:
   socket_io_client: ^3.0.2
   fl_chart: ^0.69.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

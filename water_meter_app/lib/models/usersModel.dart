@@ -6,14 +6,20 @@ class User {
   final String name;
   final String email;
   final String password;
-  final String token;
+  final String? phone;
+  final String? address;
+  final String? image;
+  final String? token;
 
   User({
     required this.id,
     required this.name,
     required this.email,
     required this.password,
-    required this.token,
+    this.phone,
+    this.address,
+     this.image,
+    this.token,
     }
   );
 
@@ -23,9 +29,13 @@ class User {
       'name': name,
       'email': email,
       'password': password,
+      'phone': phone,
+      'address': address,
+      'image': image,
       'token': token,
     };
   }
+
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
@@ -33,6 +43,9 @@ class User {
       name: map['name'] as String,
       email: map['email'] as String,
       password: map['password'] as String,
+      phone: map['phone'] != null ? map['phone'] as String : null, // Kiểm tra null
+      address: map['address'] != null ? map['address'] as String : null, // Kiểm tra null
+      image: map['image'] != null ? map['image'] as String : null, // Kiểm tra null
       token: map['token'] as String,
     );
   }

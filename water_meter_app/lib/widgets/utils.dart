@@ -4,38 +4,40 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 void showSnackBar(BuildContext context, String text) {
-    // if(context.mounted) {
-     
-    // }
-     ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(text),
-              duration: Duration(seconds: 2),
-            ),
-          );
-    
+    if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 }
 
 void httpErrorHandle({
-  required http.Response respone,
+  required http.Response response,
   required BuildContext context,
   required VoidCallback onSuccess
 }) {
-  switch(respone.statusCode) {
+  switch(response.statusCode) {
     case 200:
-      onSuccess;
+      onSuccess();
       break;
     case 400:
-      showSnackBar(context, jsonDecode(respone.body)['msg']);
-      print(respone.body);
+      showSnackBar(context, jsonDecode(response.body)['msg']);
+      print(response.body);
       break;
     case 500:
-      showSnackBar(context, jsonDecode(respone.body)['error']);
-      print(respone.body);
+      showSnackBar(context, jsonDecode(response.body)['error']);
+      print(response.body);
       break;
     default:
-      showSnackBar(context, respone.body);
-      print(respone.body);
+      showSnackBar(context, response.body);
+      print(response.body);
       
   }
 }

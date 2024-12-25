@@ -9,6 +9,9 @@ class UserProvider extends ChangeNotifier {
       name: '',
       email: '',
       password: '',
+      phone: '',
+      address: '',
+      image: '',
       token: ''
     );
 
@@ -16,12 +19,13 @@ class UserProvider extends ChangeNotifier {
 
     void setUser(String user) {
       _user = User.fromJson(user);
-      notifyListeners();
+      notifyListeners(); 
     }
 
     void setUserFromModel(User user){
       _user = user;
       notifyListeners();
     }
+    
 
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:water_meter_app/providers/device_provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
 import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/views/home_page.dart';
@@ -8,7 +9,8 @@ void main() {
   runApp(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => UserProvider())
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => DeviceProvider()),
         ],
         child: const MyApp(),
         )
@@ -26,10 +28,11 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        // '/': (context) => const LoginPage(),
+         '/': (context) => const LoginPage(),
         // '/login': (context) => const LoginPage(),
-        '/': (context) => const HomePage()
+        //'/': (context) => const HomePage()
       },
+      debugShowCheckedModeBanner: false,
       /// Đặt HomePage làm màn hình khởi tạo
     );
   }

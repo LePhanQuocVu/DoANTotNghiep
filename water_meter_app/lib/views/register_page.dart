@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:water_meter_app/services/auth_services.dart';
+import 'package:water_meter_app/widgets/utils.dart';
 
 class RegisterPage extends StatelessWidget {
   
@@ -160,9 +161,16 @@ class RegisterPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if(_formkey.currentState?.validate() ?? false) {
-                        authServices.signUpUser(context: context, email: _emailController.text, password: _passwordController.text, name: _nameController.text);
+                        try {
+                          authServices.signUpUser(context: context, email: _emailController.text, password: _passwordController.text, name: _nameController.text);
+                        }
+                        catch (e){
+                            print('Đăng kí thất bại');
+                        }
+                        //showSnackBar(context, text)
+                
                       }
                     },
                      child: const Text("Đăng kí"),

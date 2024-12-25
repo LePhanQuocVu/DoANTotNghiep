@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:water_meter_app/models/usersModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:water_meter_app/providers/user_provider.dart';
+import 'package:water_meter_app/services/api_constant.dart';
+import 'package:water_meter_app/views/home.dart';
 import 'package:water_meter_app/views/home_page.dart';
 import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/widgets/utils.dart';
 import 'package:provider/provider.dart';
+
+import '../services/api_constant.dart';
 class AuthServices {
 
  /* SIGN UP */
@@ -27,32 +31,35 @@ class AuthServices {
         token: ''
       );
 
+    print('Call LINK: ${ApiConstant.baseUrl}/api/register');
       http.Response res = await http.post(
-        Uri.parse('http://10.0.186.166:3000/api/register'),
+        Uri.parse('${ApiConstant.baseUrl}/api/register'),
         body: user.toJson(),
         headers: <String, String> {
           'Content-Type': 'application/json; charset=UTF-8'
         }
       );
       
-      if(res.statusCode == 200) {
-        showSnackBar(context, "Tạo tài khoản thành công!");
-        Navigator.pushReplacement(
+      httpErrorHandle(
+      response: res,
+      context: context,
+      onSuccess: () async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Tạo tài khoản thành công!",
+                 style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: const Color.fromARGB(255, 70, 140, 231), 
+              duration: const Duration(seconds: 2),
+            )
+          );
+          Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-        // Navigator.pushReplacement(context, '/login');
-      } else {
-
-      }
-      // httpErrorHandle(
-      //   respone: res,
-      //   context: context,
-      //   onSuccess: () {
-      //     showSnackBar(context, 
-      //     'Account created! Login with the same credentials');
-      //   },
-      // );
+       }
+      );
     } catch (e) {
         print("error: ${e}");
         showSnackBar(context, e.toString());
@@ -69,9 +76,10 @@ class AuthServices {
   try{
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     final navigator = Navigator.of(context);
-    final url = Uri.parse('http://10.0.186.166:3000/api/login');
+    print('Call LINK: ${ApiConstant.baseUrl}/api/login');
+    final url = Uri.parse('${ApiConstant.baseUrl}/api/login');
 
-    final response = await http.post(
+    final res = await http.post(
       url,
       headers: <String, String>{
          'Content-Type': 'application/json; charset=UTF-8',
@@ -81,40 +89,32 @@ class AuthServices {
         'password': password,
         }),
     );
+        print('${res.body}');
+       print('Status code: ${res.statusCode}');
   
-    if(response.statusCode == 200) {
-      userProvider.setUser(response.body);
-        navigator.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
-        // Chờ cho SnackBar hoàn thành thời gian hiển thị
-    //await Future.delayed(Duration(seconds: 2));
-    showSnackBar(context, "Đăng nhập thành công");
-    } else{
-      showSnackBar(context, jsonDecode(response.body)['msg'] );
-    }
-    // httpErrorHandle(
-    //   respone: res,
-    //   context: context,
-    //   onSuccess: () async {
-    //     //  SharedPreferences prefs = await SharedPreferences.getInstance();
-    //       userProvider.setUser(res.body);
-    //     //  await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
-
-    //       navigator.pushAndRemoveUntil(
-    //         MaterialPageRoute(
-    //           builder: (context) => const HomePage(),
-    //           ),
-    //           (route) => false,
-    //       );
-    //    }
-    //   );
+    httpErrorHandle(
+      response: res,
+      context: context,
+      onSuccess: () async {
+          userProvider.setUser(res.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Đâng nhập thành công!",
+                 style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: const Color.fromARGB(255, 70, 140, 231), 
+              duration: const Duration(seconds: 2),
+            )
+          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+       }
+      );
 
   } catch(e) {
      showSnackBar(context, e.toString());
       print("error: ${e}");
   }
-
  }
 
  /**LOG OUT */

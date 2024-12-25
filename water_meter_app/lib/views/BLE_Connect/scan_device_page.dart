@@ -19,6 +19,7 @@ class _ScanDeviceState extends State<ScanDevicePage> {
   List<ScanResult> _scanResults = [];
   bool _isScanning = false;
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
+
   late StreamSubscription<bool> _isScanningSubscription;
 
   @override
@@ -60,6 +61,7 @@ class _ScanDeviceState extends State<ScanDevicePage> {
     }
     try {
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+     // await FlutterBluePlus.startScan();
     } catch (e) {
        Snackbar.show(ABC.b, prettyException("Start Scan Error:", e), success: false);
        print("Ban gap loi : ${e}");
@@ -100,13 +102,32 @@ class _ScanDeviceState extends State<ScanDevicePage> {
 
   Widget buildScanButton(BuildContext context) {
     if (FlutterBluePlus.isScanningNow) {
-      return FloatingActionButton(
-        child: const Icon(Icons.stop),
+      return Container(
+        width: 100,
+        height: 50,
+        child: FloatingActionButton(
         onPressed: onStopPressed,
         backgroundColor: Colors.red,
+        child: const Icon(Icons.stop),
+        )
       );
+      
     } else {
-      return FloatingActionButton(child: const Text("Quét"), onPressed: onScanPressed);
+      return Container(
+        width: 120,
+        height: 50,
+        child: FloatingActionButton(
+          onPressed: onScanPressed,
+          backgroundColor: const Color.fromARGB(255, 1, 1, 1),
+          child: const Text("Quét thiết bị",
+          style: TextStyle(
+          fontSize: 20,
+          color: Colors.white,
+          ),
+        ),
+        ),
+      );
+       //FloatingActionButton(child: const Text("Quét"), onPressed: onScanPressed);
     }
   }
 
@@ -144,19 +165,49 @@ class _ScanDeviceState extends State<ScanDevicePage> {
       key: Snackbar.snackBarKeyB,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Kết nối thiết bị'),
+          title: const Text('Kết nối ESP32S3'),
         ),
-        body: RefreshIndicator(
-          onRefresh: onRefresh,
-          child: ListView(
-            children: <Widget>[
-              ..._buildSystemDeviceTiles(context),
-              ..._buildScanResultTiles(context),
-            ],
+      body: Column(
+        children: [
+          // Nút quét ở vị trí gần appBar
+           Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const Text("Nhấn nút để quét thiết bị",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(height: 10,),
+                buildScanButton(context),
+              ],
+            ),
           ),
-        ),
-        floatingActionButton: buildScanButton(context),
+           Expanded(
+            child:  RefreshIndicator(
+              onRefresh: onRefresh,
+              child: ListView(
+                children: <Widget>[
+                  ..._buildSystemDeviceTiles(context),
+                  ..._buildScanResultTiles(context),
+                ],
+              ),
+            )
+          )
+        ],
       ),
+      //   body: RefreshIndicator(
+      //     onRefresh: onRefresh,
+      //     child: ListView(
+      //       children: <Widget>[
+      //         ..._buildSystemDeviceTiles(context),
+      //         ..._buildScanResultTiles(context),
+      //       ],
+      //     ),
+      //   ),
+      //   floatingActionButton: buildScanButton(context),
+       ),
     );
   }
 }

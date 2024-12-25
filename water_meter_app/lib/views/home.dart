@@ -3,37 +3,47 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
+import 'package:water_meter_app/views/BLE_Connect/devices_page.dart';
 import 'package:water_meter_app/views/BLE_Connect/scan_device_page.dart';
 import 'package:water_meter_app/views/batery_page.dart';
 import 'package:water_meter_app/views/chart_history.dart';
 import 'package:water_meter_app/views/history_page.dart';
+import 'package:water_meter_app/views/install_devices_page.dart';
 import 'package:water_meter_app/views/notification_page.dart';
 import 'package:water_meter_app/views/profile_page.dart';
 import 'package:water_meter_app/views/setting_page.dart';
+import 'package:water_meter_app/widgets/utils.dart';
 import '../providers/user_provider.dart';
 class HomeContentPage extends StatefulWidget {
-  const HomeContentPage({super.key});
+  //  final String? wellcomeMessage;
 
+  const HomeContentPage({super.key});
+ //const HomeContentPage({Key? key, required this.wellcomeMessage}) : super(key: key);
   @override
   State<HomeContentPage> createState() => _HomeContentPageState();
 }
 
 class _HomeContentPageState extends State<HomeContentPage> {
- 
-
+  
+  
   @override void initState() {
     // TODO: implement initState
     super.initState();
+  //   if(widget.wellcomeMessage != null) {
+  //   showSnackBar(context, widget.wellcomeMessage.toString());
+  // }
   }
+
+
   @override
   Widget build(BuildContext context) {
   
   int _currentIndex = 0;
-  final user = Provider.of<UserProvider>(context).user;
+  final userProvider = Provider.of<UserProvider>(context);
 
   final List<Map<String, dynamic>> cardData = [
     {
-      "title": "Kết nối BLE",
+      "title": "Kết nối ESP32",
       "icon": Icons.bluetooth,
     },
     {
@@ -41,7 +51,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
       "icon": Icons.history,
     },
     {
-      "title": "Thông tin",
+      "title": "Thiết bị",
       "icon": Icons.punch_clock_outlined,
     },
     {
@@ -53,7 +63,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   final List<Widget> _pages = [
       const ScanDevicePage(),
       const ChartHistory(),
-      const SettingPage(),
+      const InstallDevicesPage(),
       const BateryPage(),
   ];
 
@@ -66,39 +76,29 @@ class _HomeContentPageState extends State<HomeContentPage> {
             expandedHeight: 100,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: const Text('SMART METER'),
+              centerTitle: true,
+              title:  Text('SMART METER',
+              style: TextStyle(
+                fontSize: 30.0, // Kích thước font chữ
+                  fontWeight: FontWeight.bold, // Độ đậm chữ
+                  fontFamily: 'Roboto', // Font chữ, có thể thay đổi thành font khác
+                  color: const Color.fromARGB(255, 3, 5, 6), // Màu chữ
+                  letterSpacing: 2.0, // Khoảng cách giữa các chữ
+                  shadows: [
+                    Shadow(
+                      offset: Offset(2.0, 2.0), // Độ lệch bóng
+                      blurRadius: 3.0, // Độ mờ của bóng
+                      color: Colors.black.withOpacity(0.3), // Màu bóng chữ
+                    ),
+                  ],
+                ),
+              ),
               background: Image.asset(
                 'assets/images/profile.jpg',
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          //  // Sliver để hiển thị tiêu đề "Xin chào [Tên người dùng]"
-          // SliverToBoxAdapter(
-          //   child: Container(
-          //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-          //     color: Colors.white,
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //       children: [
-          //         Text(
-          //           "Xin chào, ${user.name}",
-          //           style: const TextStyle(
-          //             fontSize: 18,
-          //             fontWeight: FontWeight.bold,
-          //             color: Colors.black,
-          //           ),
-          //         ),
-          //         IconButton(
-          //           icon: const Icon(Icons.logout),
-          //           onPressed: () {
-          //             // Thêm logic đăng xuất tại đây
-          //           },
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ];
       },
       body: SingleChildScrollView(
@@ -106,10 +106,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const Row(
+               Row(
                   children: [
                   CircleAvatar(
-                    radius: 30,
+                     radius: 30,
                     backgroundColor: Colors.blue,
                     backgroundImage:  AssetImage("assets/images/profile.jpg"),
                   ),
@@ -123,7 +123,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     ),
                     SizedBox(height: 5,),
                     Text(
-                      "Quốc Vũ",
+                      "${userProvider.user.name}",
                        style: TextStyle(color: Colors.black, fontSize: 20, 
                       fontWeight: FontWeight.bold,
                       ),
@@ -204,7 +204,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               else if(index == 2) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                                  MaterialPageRoute(builder: (builder) => const InstallDevicesPage()));
                               }
                               else if(index == 3) {
                                 Navigator.push(
