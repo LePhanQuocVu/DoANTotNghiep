@@ -195,7 +195,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                           ),
                                           child: 
                                             Image.asset(
-                                              'assets/images/profile.jpg',
+                                              'assets/images/dhc.jpg',
                                               fit: BoxFit.cover,), // Thay đường dẫn ảnh
                                         ),
                                         const SizedBox(height: 8),
@@ -230,7 +230,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                                 BorderRadius.circular(8),
                                           ),
                                           child: Image.asset(
-                                              'assets/images/profile.jpg',
+                                              'assets/images/dhch.jpg',
                                               fit: BoxFit.cover,
                                               ),
                                                 // Thay đường dẫn ảnh
@@ -311,8 +311,9 @@ class DeviceInfor extends StatefulWidget {
 
 class _DeviceInforState extends State<DeviceInfor> {
   late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-  late TextEditingController _locationControler = TextEditingController();
+  late TextEditingController _emailController;
+  late TextEditingController _addressController;
+
 
 
   final DevicesServices device = DevicesServices();
@@ -322,6 +323,10 @@ class _DeviceInforState extends State<DeviceInfor> {
     // TODO: implement initState
    
     super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _nameController = TextEditingController(text: userProvider.user.name);
+     _emailController = TextEditingController(text: userProvider.user.email);
+     _addressController = TextEditingController(text: userProvider.user.address);
   }
 
   @override
@@ -335,12 +340,15 @@ class _DeviceInforState extends State<DeviceInfor> {
     String? type;
      //  String? location;
     String? selectedDeviceType;
+
+
     final _formKey = GlobalKey<FormState>();
     setState(() {
        //device.getDeviceByUserId(userProvider.user.id);
       final userProvider = Provider.of<UserProvider>(context, listen: false);
      _nameController = TextEditingController(text: userProvider.user.name);
-     _phoneController = TextEditingController(text: userProvider.user.phone);
+     _emailController = TextEditingController(text: userProvider.user.email);
+     _addressController = TextEditingController(text: deviceProvider.device.location);
     });
 
     return Padding(
@@ -539,18 +547,26 @@ class _DeviceInforState extends State<DeviceInfor> {
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Column(
                           children: [
+                            SizedBox(height: 10,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Cập nhật thiết bị')
+                                Text('Cập nhật thiết bị',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),)
                               ],
                             ),
                             SizedBox(height: 20,),
+                             SizedBox(height: 20,),
                              TextFormField(
+                              readOnly: true,
                               controller: _nameController,
                               decoration: InputDecoration(
                                 labelText: "Tên người dùng",
                                 prefixIcon: const Icon(Icons.person_outline),
+                                filled: true, // Bật màu nền
+                                fillColor: Colors.grey[300], // Màu nền mờ
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -562,10 +578,13 @@ class _DeviceInforState extends State<DeviceInfor> {
                             ),
                             SizedBox(height: 20,),
                             TextFormField(
-                              controller: _phoneController,
+                              readOnly: true,
+                              controller: _emailController,
                               decoration: InputDecoration(
-                                labelText: "Số điện thoại",
+                                labelText: "Email",
                                 prefixIcon: const Icon(Icons.phone_android_rounded),
+                                filled: true, // Bật màu nền
+                                fillColor: Colors.grey[300], // Màu nền mờ
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -576,7 +595,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                             ),
                             SizedBox(height: 20,),
                             TextFormField(
-                              controller: _locationControler,
+                              controller: _addressController,
                               decoration: InputDecoration(
                                 labelText: "Địa chỉ",
                                 prefixIcon: const Icon(Icons.location_city_rounded),
@@ -629,7 +648,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                                           ),
                                           child: 
                                             Image.asset(
-                                              'assets/images/profile.jpg',
+                                              'assets/images/dhc.jpg',
                                               fit: BoxFit.cover,), // Thay đường dẫn ảnh
                                         ),
                                         const SizedBox(height: 8),
@@ -664,7 +683,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                                                 BorderRadius.circular(8),
                                           ),
                                           child: Image.asset(
-                                              'assets/images/profile.jpg',
+                                              'assets/images/dhch.jpg',
                                               fit: BoxFit.cover,
                                               ),
                                                 // Thay đường dẫn ảnh
@@ -684,15 +703,15 @@ class _DeviceInforState extends State<DeviceInfor> {
                                 child: const Text('Lưu'),
                                 // onPressed: () => Navigator.pop(context),
                                 onPressed: () {
-                                  //CREATE DEVICE
+                                  //UPDATE
                                   if(_formKey.currentState?.validate() ?? false) {
-                                    //devicesServices.createDevice(user_id: userProvider.user.id, location: _locationControler.text, type: type.toString());
+                                    //update
                                   }
                                   Navigator.pop(context);
                                 },
                               ),
                               ],
-                            )
+                            ),
                           ]
                         )
                       )

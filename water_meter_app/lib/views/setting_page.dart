@@ -5,6 +5,7 @@ import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/views/logout_page.dart';
 import 'package:water_meter_app/views/notification_page.dart';
 import 'package:water_meter_app/views/profile_page.dart';
+import 'package:water_meter_app/views/update_infor.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -32,7 +33,7 @@ class _SettingPageState extends State<SettingPage> {
 
   final List<Widget> _pages = [
     ProfilePage(),
-    ProfilePage(),
+    UpdateInforPage(),
     ProfilePage(),
     LoginPage(),
   ];

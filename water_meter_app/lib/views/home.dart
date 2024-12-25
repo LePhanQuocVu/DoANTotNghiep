@@ -18,7 +18,6 @@ class HomeContentPage extends StatefulWidget {
   //  final String? wellcomeMessage;
 
   const HomeContentPage({super.key});
- //const HomeContentPage({Key? key, required this.wellcomeMessage}) : super(key: key);
   @override
   State<HomeContentPage> createState() => _HomeContentPageState();
 }
@@ -29,11 +28,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   @override void initState() {
     // TODO: implement initState
     super.initState();
-  //   if(widget.wellcomeMessage != null) {
-  //   showSnackBar(context, widget.wellcomeMessage.toString());
-  // }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +38,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   final List<Map<String, dynamic>> cardData = [
     {
+      "title": "Thiết bị",
+      "icon": Icons.punch_clock_outlined,
+    },
+    {
       "title": "Kết nối ESP32",
       "icon": Icons.bluetooth,
     },
@@ -51,19 +50,15 @@ class _HomeContentPageState extends State<HomeContentPage> {
       "icon": Icons.history,
     },
     {
-      "title": "Thiết bị",
-      "icon": Icons.punch_clock_outlined,
-    },
-    {
       "title": "Dung lượng Pin",
       "icon": Icons.pin,
     },
   ];
 
   final List<Widget> _pages = [
+      const InstallDevicesPage(),
       const ScanDevicePage(),
       const ChartHistory(),
-      const InstallDevicesPage(),
       const BateryPage(),
   ];
 
@@ -94,7 +89,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                 ),
               ),
               background: Image.asset(
-                'assets/images/profile.jpg',
+                'assets/images/background.jpg',
                 fit: BoxFit.cover,
               ),
             ),
@@ -195,16 +190,16 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                 Navigator.push(
                                 context, 
                                 MaterialPageRoute(
-                                  builder: (context) => const ScanDevicePage()));
+                                  builder: (context) => const InstallDevicesPage()));
                               } else if(index == 1) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                                  MaterialPageRoute(builder: (builder) => const ScanDevicePage()));
                               }
                               else if(index == 2) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const InstallDevicesPage()));
+                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
                               }
                               else if(index == 3) {
                                 Navigator.push(
