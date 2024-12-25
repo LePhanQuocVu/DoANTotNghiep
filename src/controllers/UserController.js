@@ -82,7 +82,8 @@ class UserController {
             }
 
             const token = jwt.sign({id: user._id}, "passwordKey");
-            res.json({token, ...user._doc});
+            return res.status(200).json({token, ...user._doc});
+           // res.json({token, ...user._doc});
 
         }catch(e) {
             res.status(500).json({error: e.message});
