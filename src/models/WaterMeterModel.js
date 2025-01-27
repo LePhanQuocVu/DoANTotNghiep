@@ -16,6 +16,16 @@ const deviceSchema = new Schema({
         type: Date, 
         default: Date.now 
     },
+    data: {
+        type: [
+            {
+                value: { type: Number, required: true },
+                timestamp: { type: Date, default: Date.now },
+                _id: false,
+            }
+        ],
+        default: [], // Mặc định là mảng rỗng
+    }
 });
 
 const WaterMeter = mongoose.model('waterdevice', deviceSchema);
