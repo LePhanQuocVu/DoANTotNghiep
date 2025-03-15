@@ -10,4 +10,7 @@ userRouter.get("/api/users", User.getAllUser);
 // update infomation
 userRouter.put("/api/user/update/:id", User.updateUser);
 
+
+// update firmare
+userRouter.post("api/updateFirm/:id", User.updateFirmware);
 module.exports = userRouter;
