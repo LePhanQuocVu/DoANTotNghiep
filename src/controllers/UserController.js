@@ -9,7 +9,7 @@ class UserController {
     getAllUser = async (req, res) => {
         try{
             const users = await User.find({});
-            return res.status(200).json(user);
+            return res.status(200).json(users);
         }catch(err){
             return res.status(500).json(err);
         }
@@ -133,6 +133,14 @@ class UserController {
             }
         catch (e) {
             res.status(500).json({ error: e.message });
+        }
+    }
+
+    updateFirmware = async () => {
+        try{
+            
+        } catch (e) {
+            res.status(500).json({ error: e.message});
         }
     }
   

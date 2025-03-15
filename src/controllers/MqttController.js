@@ -46,7 +46,7 @@ class MqttController {
 
         // Lưu dữ liệu vào cơ sở dữ liệu
         try {
-          const userId = "678cce97400b3a0cbae19306"; // user_id từ topic
+          const userId = "6768d8b3c7edacf62ed36b33"; // user_id từ topic
           const flowRate = JSON.parse(message.toString());
 
           if (isNaN(flowRate)) {
