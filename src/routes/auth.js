@@ -1,8 +1,8 @@
 var express  = require('express');
 var authRouter = express.Router();
-var User = require('../controllers/UserController')
+var UserController = require('../controllers/UserController')
 
-authRouter.post("/api/register", User.registerUser);
-authRouter.post("/api/login", User.loginUser);
+authRouter.post("/api/register", UserController.registerUser);
+authRouter.post("/api/login", UserController.loginUser);
 
 module.exports = authRouter;

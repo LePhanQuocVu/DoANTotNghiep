@@ -1,7 +1,9 @@
 
 const { json } = require('express');
-const Water = require('../models/WaterMeterModel');
+// const Water = require('../models/WaterMeterModel');
 const WaterMeter = require('../models/WaterMeterModel');
+
+const Notification = require('../models/NotificationModel');
 const mongoose = require('mongoose');
 
 class WaterController {
@@ -23,36 +25,59 @@ class WaterController {
                 user_id: user_id, // Lấy user_id từ req.body
                 location: location, //location
                 status: status || false, // Default là false
-                cordinates: {
-                    longitude: longitude,
-                    latitude: latitude,
-                },
+                longitude: longitude,
+                latitude: latitude,
             });
             const waterDevice = await newDevice.save();
             if(!waterDevice) {
                 return res.status(400).json({msg: "Không thể tạo thiết bị!"});
-            }
+            } 
+            const newNotify = new Notification({
+                userId: user_id,
+                title: "Tạo mới thành công!",
+                message: "Đã lắp đặt thiết bị thành công!",
+                type: "infor",
+                isRead: false
+            });
+            
             return res.status(200).json(waterDevice);
         } catch(e) {
             console.log(e);
             return res.status(500).json({msg: "Error from Server"});
         }
     } 
+
+    // GET ALL DEVICE
+
+    getAllDevices = async(req, res) => {
+        try{
+            const devices = await WaterMeter.find().select('-data');
+            console.log(devices);
+            if(devices.length == 0) {
+                return res.status(400).json({msg: "Chưa có thiết bị cài đặt"});
+            }
+            return res.status(200).json(devices);
+        } catch (e){
+            console.log(e);
+        }
+    }
+
+    // GET DEVICE BY ID
     getDeviceByUserId = async(req, res) => {
         try{
             const user_id = req.params.id;
             console.log(req.params);
             console.log(user_id);
+
             if(!user_id) {
                 return res.status(400).json({msg: "Người dùng chưa cài đặt!"})
             }
-            const device = await WaterMeter.find({user_id: user_id});
+            const device = await WaterMeter.find({user_id: user_id}).select('-data');
             console.log(device);
-            if(!device) {
-                return res.status(400).json({msg: "Error"});
+            if(device.length == 0) {
+                return res.status(400).json({msg: "Người dùng chưa cài đặt thiết bị"});
             }
             return res.status(200).json(device);
-
         }
         catch(e) {
             console.log(e);
@@ -63,9 +88,9 @@ class WaterController {
         try {
             const deviceId = req.params.id;
             console.log(deviceId);
-            const {deviceType, location, status} = req.body;
+            const {deviceType, location, status, longitude, latitude} = req.body;
            
-            const device =  await WaterMeter.findById(deviceId);
+            const device =  await WaterMeter.findById(deviceId).select('-data');
             if(!device) {
                 return res.status(400).json({msg: "Device not exit"});
             }
@@ -75,6 +100,8 @@ class WaterController {
             device.status = status || device.status;
             device.location = location || device.location;
             device.status = status || device.status;
+            device.longitude = longitude || device.longitude;
+            device.latitude = latitude || device.latitude;
 
             const deviceUpdated = await device.save();
             
@@ -84,10 +111,12 @@ class WaterController {
             return res.status(200).json(deviceUpdated);
         }
         catch (e){
-            console.error(e);
+            console.log(`Loi update device: ${e}`);
             return res.status(500).json({error: e.message});
         }
     }
+
+    
     getDataByDay = async (req,res) => {
         try {
             const userId = req.params.id;
@@ -170,6 +199,7 @@ class WaterController {
             { $sort: { "_id": 1 } } // Sắp xếp theo ngày tăng dần
         ]);
 
+        console.log(result);
         const formattedResult = result.map(item => ({
             date: item._id, // Chuyển _id thành date
             totalFlow: item.totalFlow

@@ -3,7 +3,7 @@ const express = require('express');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const waterRouter = require('./routes/water');
-
+const adminRouter = require('./routes/admin');
 const { Server } = require("socket.io");
 const { createServer } = require('http');
 
@@ -26,15 +26,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 
-// Thiết lập các route
-app.use('/', authRouter);
-app.use('/', userRouter);
-app.use('/', waterRouter);
+// Thiết lập các route cho User
+// app.use('/', authRouter);
+app.use('/user', userRouter);
+app.use('/water', waterRouter);
+
+// // Thiết lập các route cho Admin
+app.use('/admin',adminRouter);
 
 // Test route cho socket.io
 app.use('/', (req, res) => {
   res.send('<h1>Test Socket.IO server</h1>');
 });
+
 
 // Truyền `io` vào `mqttController`
 mqttController.initialize(io);

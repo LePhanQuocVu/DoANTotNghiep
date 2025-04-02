@@ -6,9 +6,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModel');
 class UserController {
     // GET ALL USER
-    getAllUser = async (req, res) => {
+    getAllUsers = async (req, res) => {
         try{
             const users = await User.find({});
+            if(users.length == 0) {
+                return res.status(400).json({msg: "No user!"});
+            }
             return res.status(200).json(users);
         }catch(err){
             return res.status(500).json(err);

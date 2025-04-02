@@ -9,18 +9,12 @@ const deviceSchema = new Schema({
         ref: "user", // 1 :1 
         require: true,
     },
-    location: { type: String, require: true},
-    deviceType: {type: String, require: true},
-    status: {type: Boolean, default: false},
+    location: { type: String, required: true},
+    deviceType: {type: String, required: true},
+    status: {type: Boolean, default: true}, // trang thai lap dat thiet bi
     bateryLevel: {type: Number, default: 100}, // 100% batery
-    cordinates: {
-        longitude: { type: String, require: true },
-        latitude: { type: String, require: true },
-    },
-    create_at: { 
-        type: Date, 
-        default: Date.now 
-    },
+    longitude: { type: String, required: true},
+    latitude: { type: String, required: true},
     data: {
         type: [
             {
@@ -30,7 +24,9 @@ const deviceSchema = new Schema({
         ],
         default: [], // Mặc định là mảng rỗng
     }
-});
+    }, 
+    {timestamps: true}
+);
 
 const WaterMeter = mongoose.model('waterdevice', deviceSchema);
 module.exports = WaterMeter;

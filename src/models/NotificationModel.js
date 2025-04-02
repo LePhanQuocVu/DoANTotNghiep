@@ -16,23 +16,15 @@ const notifySchema = Schema({
         type: String,
         require: true
     },
-    category: {
-        type: String,
-        default: "THong bao chung"
-    },
     type: {
         type: String,
         enum: ['alert', 'warning', 'infor'],
         default: 'info'
     },
-    read: {
+    isRead: {
         type: Boolean,
         default: false
     },
-    metaData: {
-        deviceId: String,
-        serverity: String
-    }
 }, {timestamps: true});
 
 module.exports = mongoose.model("notifications",notifySchema);

@@ -1,15 +1,19 @@
 var express  = require('express');
 var waterRouter = express.Router();
 
-var Water = require('../controllers/WaterController');
+var WaterController = require('../controllers/WaterController');
 
-waterRouter.post('/api/water/create', Water.createDevice);
-waterRouter.put('/api/water/update/:id', Water.updateDevice);
+/********** USER */
+/** Device  */
+waterRouter.post('/api/create', WaterController.createDevice);
+waterRouter.put('/api/update/:id', WaterController.updateDevice);
+waterRouter.get('/api/getDeviceByUserId/:id', WaterController.getDeviceByUserId);
 
-waterRouter.get('/api/device/getByUserId/:id', Water.getDeviceByUserId);
+/** HISTORY */
 
-waterRouter.get('/api/device/daily/:id', Water.getDataByDay);
+waterRouter.get('/api/device/daily/:id', WaterController.getDataByDay);
+waterRouter.get('/api/device/range/:id', WaterController.getDataByRange);
 
-waterRouter.get('/api/device/range/:id', Water.getDataByRange);
+// waterRouter.get('api/getAllUsers', )
 
 module.exports = waterRouter;
