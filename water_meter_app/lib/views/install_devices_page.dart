@@ -1,32 +1,68 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/device_provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
+import 'package:water_meter_app/services/api_constant.dart';
 import 'package:water_meter_app/services/devices_services.dart';
-import '../providers/user_provider.dart';
-import '../providers/device_provider.dart';
+import 'package:location/location.dart';
+import 'package:water_meter_app/widgets/utils.dart';
+import 'package:http/http.dart' as http;
 class InstallDevicesPage extends StatefulWidget {
   const InstallDevicesPage({super.key});
-
+  
   @override
   State<InstallDevicesPage> createState() => _InstallDevicesPagetate();
 }
 
 class _InstallDevicesPagetate extends State<InstallDevicesPage> {
 
-
+  
    String? deviceName;
    String? type;
   //  String? location;
   String? selectedDeviceType;
   // String? deviceType;
-  
+  bool isSetup = false;
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late TextEditingController _locationControler = TextEditingController();
+  late TextEditingController _longitudeController = TextEditingController();
+  late TextEditingController _latitudeController = TextEditingController();
 
+  late TextEditingController _specificLocationController = TextEditingController();
 
+  late UserProvider userProvider;
+
+  late DeviceProvider deviceProvider;
+  Future<void> fetchDeviceByUserId(String userId) async {
+    try {
+      String apiUrl = "${ApiConstant.baseUrl}/water/api/getDeviceByUserId/${userId}";
+      print(apiUrl);
+      final response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200) {
+        print("Thông tin đồng hồ: ${response.body}");
+        setState(() {
+          isSetup = true;
+          deviceProvider.setDeviceName("Created");
+          // deviceProvider.setDevice(response.body.toString());
+          // deviceProvider.setDeviceName("${deviceProvider.device.deviceType}");
+          // print("Tên của thiết bị là: ${deviceProvider.deviceName}");
+          // deviceProvider.setDevice(response.body);
+        });
+      } else {
+        print("Chưa có thiết bị được cài đặt");
+        setState(() {
+          deviceProvider.setDeviceName("");
+        });
+      }
+    }
+    catch(e) {
+      print("Error: ${e}");
+    }
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -35,7 +71,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
      _nameController = TextEditingController(text: userProvider.user.name);
      _phoneController = TextEditingController(text: userProvider.user.phone);
      _emailController = TextEditingController(text: userProvider.user.email);
-  
+     fetchDeviceByUserId(userProvider.user.id);
   }
   @override
   void dispose() {
@@ -44,17 +80,52 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
+    _specificLocationController.dispose();
   }
   @override
   Widget build(BuildContext context) {
-
-    final userProvider = Provider.of<UserProvider>(context);
-    final deviceProvider = Provider.of<DeviceProvider>(context);
-
-
+    deviceProvider = Provider.of<DeviceProvider>(context);
+    // final userProvider = Provider.of<UserProvider>(context);
+   // final deviceProvider = Provider.of<DeviceProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
     final DevicesServices devicesServices = DevicesServices();
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
+
+    Future<void> _getCurrentLocation() async {
+      Location locationService = new Location();
+      bool _serviceEnabled;
+      PermissionStatus _permissionGranted;
+      LocationData _locationData;
+
+      _serviceEnabled = await locationService.serviceEnabled();
+      if (!_serviceEnabled) {
+        _serviceEnabled = await locationService.requestService();
+        if (!_serviceEnabled) {
+          return;
+        }
+      }
+
+    _permissionGranted = await locationService.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await locationService.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    _locationData = await locationService.getLocation();
+    setState(() {
+       _longitudeController.text = _locationData.longitude?.toString() ?? '';
+      _latitudeController.text = _locationData.latitude?.toString() ?? '';
+      _specificLocationController.text = "Lat: ${_locationData.latitude}, Long: ${_locationData.longitude}";
+      print(_longitudeController.text);
+      print(_latitudeController.text);
+    });
+  }
+
+   
     return Scaffold(
       appBar: AppBar(
         title: Text('Thông tin thiết bị'),
@@ -65,7 +136,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
           // mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if(deviceProvider.deviceName == null) ...{
+            if((!isSetup)) ...{
               Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -86,10 +157,10 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                 isScrollControlled: true,
                 builder: (BuildContext context) {
                   return FractionallySizedBox(
-                    heightFactor: 0.8,
+                    heightFactor: 0.9,
                     widthFactor: 0.9,
                     child: Form(
-                      key: _formKey,
+                      key: formKey,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Column(
@@ -154,6 +225,24 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                 }
                                 return null;
                               }
+                            ),
+                            const SizedBox(height: 20,),
+                            TextFormField(
+                              controller: _specificLocationController,
+                              decoration: InputDecoration(
+                                labelText: "Vị trí",
+                                prefixIcon: const Icon(Icons.location_searching_sharp),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: _getCurrentLocation,
+                              child: const Text('Lấy vị trí hiện tại'),
                             ),
                             SizedBox(height: 10,),
                             const Row(
@@ -250,21 +339,24 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                 child: const Text('Lưu'),
                                 onPressed: () async {
                                   //CREATE DEVICE
-                                  if(_formKey.currentState?.validate() ?? false) {
-                                    
-                                    print(userProvider.user.id);
-                                     //devicesServices.createDevice({userProvider.user.id,_locationControler.text,type.toString()});
-                                     try{
-                                      await  devicesServices.createDevice(context: context, user_id: userProvider.user.id, location: _locationControler.text, type: type.toString());
-                                      setState(() {
-                                        deviceProvider.setDeviceName("Created");
-                                      });
-                                      print("Tạo thành công!");
-                                      Navigator.pop(context);
-                                     } 
-                                     catch (e) {
-                                      // Sw errro;
-                                     }
+                                  if(formKey.currentState?.validate() ?? false) {
+                                    devicesServices.createDevice(context: context, user_id: userProvider.user.id, location: _locationControler.text, type: type.toString(), longitude: _longitudeController.text, latitude: _latitudeController.text); 
+                                      if(mounted) {
+                                        setState(() {
+                                          isSetup = true;
+                                        }); // Cập nhật lại UI để load thiết bị mới
+                                        Navigator.pop(context);
+                                      }
+                                    //  try{
+                                    //   await  devicesServices.createDevice(context: context, user_id: userProvider.user.id, location: _locationControler.text, type: type.toString(), longitude: _longitudeController.text, latitude: _latitudeController.text); 
+                                    //   if(mounted) {
+                                    //     Navigator.pop(context);
+                                    //   }
+                                    //  } 
+                                    //  catch (e) {
+                                    //     SnackBar(content: Text('${e}'),
+                                    //     );
+                                    //  }
                                   } 
                                 },
                               ),
@@ -290,6 +382,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                 fontWeight: FontWeight.bold)),
             ),
             } else ...{
+              
               DeviceInfor(),
             },
              const SizedBox(height: 30),
@@ -314,15 +407,13 @@ class _DeviceInforState extends State<DeviceInfor> {
   late TextEditingController _emailController;
   late TextEditingController _addressController;
 
-
-
   final DevicesServices device = DevicesServices();
  
   @override
   void initState() {
     // TODO: implement initState
-   
     super.initState();
+    
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     _nameController = TextEditingController(text: userProvider.user.name);
      _emailController = TextEditingController(text: userProvider.user.email);
@@ -333,18 +424,13 @@ class _DeviceInforState extends State<DeviceInfor> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final deviceProvider = Provider.of<DeviceProvider>(context);
-    // setState(() {
-    //   device.getDeviceByUserId(userProvider.user.id);
-    // });
     String? deviceName;
     String? type;
      //  String? location;
     String? selectedDeviceType;
-
-
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     setState(() {
-       //device.getDeviceByUserId(userProvider.user.id);
+      //  device.getDeviceByUserId(userProvider.user.id);
       final userProvider = Provider.of<UserProvider>(context, listen: false);
      _nameController = TextEditingController(text: userProvider.user.name);
      _emailController = TextEditingController(text: userProvider.user.email);
@@ -355,14 +441,13 @@ class _DeviceInforState extends State<DeviceInfor> {
       padding: const EdgeInsets.all(16),
       child: Container(
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.,
           children: [
             // Avatar và phần Edit
                 Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 60,
                       backgroundImage:  AssetImage("assets/images/profile.jpg"),
                     ),
@@ -390,39 +475,37 @@ class _DeviceInforState extends State<DeviceInfor> {
                   ],
                 ),
             Column(
-           crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("ID thiết bị",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Roboto",
-              ),),
-              SizedBox(height: 5,),
-              Container(
-                padding: const EdgeInsets.all(5.0),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 224, 221, 221), // Màu nền
-                borderRadius: BorderRadius.circular(10), // Bo tròn 4 góc
-                ), // Màu nền
-                child: const Text(
-                  '111',
-                  style: TextStyle(
-                    fontSize: 20, // Cỡ chữ
-                    fontFamily: 'Roboto', // Font chữ
-                    color: Colors.black, // Màu chữ
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("ID thiết bị",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: "Roboto",
+                ),),
+                const SizedBox(height: 5,),
+                Container(
+                  padding: const EdgeInsets.all(5.0),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 224, 221, 221), // Màu nền
+                  borderRadius: BorderRadius.circular(10), // Bo tròn 4 góc
+                  ), // Màu nền
+                  child: const Text(
+                    '111',
+                    style: TextStyle(
+                      fontSize: 20, // Cỡ chữ
+                      fontFamily: 'Roboto', // Font chữ
+                      color: Colors.black, // Màu chữ
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
             ),
-            SizedBox(height: 10,),
-            
-            SizedBox(height: 5,),
+            SizedBox(height: 15,),
             Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Dung lượng pin",
+              const Text("Dung lượng pin",
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: "Roboto",
@@ -501,7 +584,8 @@ class _DeviceInforState extends State<DeviceInfor> {
               ),
           ],
         ),
-        Column(
+            SizedBox(height: 5,),
+            Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Thời gian",
@@ -528,8 +612,8 @@ class _DeviceInforState extends State<DeviceInfor> {
               ),
             ],
             ),
-        SizedBox(height: 10,),
-        Row(
+            SizedBox(height: 10,),
+            Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
              ElevatedButton(
@@ -542,7 +626,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                     heightFactor: 0.8,
                     widthFactor: 0.9,
                     child: Form(
-                      key: _formKey,
+                      key: formKey,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Column(
@@ -558,7 +642,6 @@ class _DeviceInforState extends State<DeviceInfor> {
                               ],
                             ),
                             SizedBox(height: 20,),
-                             SizedBox(height: 20,),
                              TextFormField(
                               readOnly: true,
                               controller: _nameController,
@@ -594,6 +677,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                               ),
                             ),
                             SizedBox(height: 20,),
+                             SizedBox(height: 20,),
                             TextFormField(
                               controller: _addressController,
                               decoration: InputDecoration(
@@ -704,7 +788,7 @@ class _DeviceInforState extends State<DeviceInfor> {
                                 // onPressed: () => Navigator.pop(context),
                                 onPressed: () {
                                   //UPDATE
-                                  if(_formKey.currentState?.validate() ?? false) {
+                                  if(formKey.currentState?.validate() ?? false) {
                                     //update
                                   }
                                   Navigator.pop(context);
@@ -729,7 +813,6 @@ class _DeviceInforState extends State<DeviceInfor> {
             )
           ],
         )
-           
           ],
         ),
       ),

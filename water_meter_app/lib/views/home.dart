@@ -1,19 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+
 import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
-import 'package:water_meter_app/views/BLE_Connect/devices_page.dart';
-import 'package:water_meter_app/views/BLE_Connect/scan_device_page.dart';
+import 'package:water_meter_app/services/socket_constant.dart';
+import 'package:water_meter_app/views/BLE_Connect/select_mode_page.dart';
 import 'package:water_meter_app/views/batery_page.dart';
 import 'package:water_meter_app/views/chart_history.dart';
-import 'package:water_meter_app/views/history_page.dart';
 import 'package:water_meter_app/views/install_devices_page.dart';
-import 'package:water_meter_app/views/notification_page.dart';
-import 'package:water_meter_app/views/profile_page.dart';
-import 'package:water_meter_app/views/setting_page.dart';
-import 'package:water_meter_app/widgets/utils.dart';
-import '../providers/user_provider.dart';
+
+import '../providers/device_provider.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 class HomeContentPage extends StatefulWidget {
   //  final String? wellcomeMessage;
 
@@ -23,19 +21,28 @@ class HomeContentPage extends StatefulWidget {
 }
 
 class _HomeContentPageState extends State<HomeContentPage> {
-  
-  
+ 
+   bool statusDevice = false;
+ 
   @override void initState() {
     // TODO: implement initState
     super.initState();
+   
+   // dataReceiver();
   }
+ 
+    @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-  
+ 
   int _currentIndex = 0;
   final userProvider = Provider.of<UserProvider>(context);
-
+  final deviceProvider = Provider.of<DeviceProvider>(context);
   final List<Map<String, dynamic>> cardData = [
     {
       "title": "Thiết bị",
@@ -55,10 +62,15 @@ class _HomeContentPageState extends State<HomeContentPage> {
     },
   ];
 
+  if(deviceProvider.device.status != null) {
+    setState(() {
+      statusDevice = true;
+    });
+  } 
   final List<Widget> _pages = [
       const InstallDevicesPage(),
-      const ScanDevicePage(),
-      const ChartHistory(),
+      const SelectModePage(),
+      const HistoryPage(),
       const BateryPage(),
   ];
 
@@ -104,7 +116,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                Row(
                   children: [
                   CircleAvatar(
-                     radius: 30,
+                    radius: 30,
                     backgroundColor: Colors.blue,
                     backgroundImage:  AssetImage("assets/images/profile.jpg"),
                   ),
@@ -153,15 +165,23 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Tổng lưu lượng
-                    CircularIndicator(
-                      title: "Tổng lưu lượng",
-                      valueText: "1234 m³",
-                      color: Colors.blue,
-                    ),
+                    // CircularIndicator(
+                    //   title: "Lưu lượng tức thời",
+                    //   valueText: ' $currentFlowRate',
+                    //   unitText: 'L/phút',
+
+                    //     color: Colors.blue,
+                    //   ),
+                      DeviceCirleIndicator(
+                        title: "Lưu lượng tức thời",
+                         valueText: '0',
+                          unitText: 'L/phút',
+                          isActive: statusDevice, 
+                          color: Colors.blue),
                     // Trạng thái
                     CircularIndicatorStatus(
-                      title: "Trạng thái",
-                      isActive: true, // Thay đổi theo trạng thái BLE
+                       title: "Trạng thái",
+                      isActive: false, // Thay đổi theo trạng thái BLE
                       colorActive: Colors.green,
                       colorInactive: const Color.fromARGB(255, 213, 211, 211),
                     ),
@@ -194,17 +214,17 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               } else if(index == 1) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const ScanDevicePage()));
+                                  MaterialPageRoute(builder: (builder) => const SelectModePage()));
                               }
                               else if(index == 2) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                                  MaterialPageRoute(builder: (builder) => const HistoryPage()));
                               }
                               else if(index == 3) {
                                 Navigator.push(
                                   context, 
-                                  MaterialPageRoute(builder: (builder) => const ChartHistory()));
+                                  MaterialPageRoute(builder: (builder) => const HistoryPage()));
                               }
                             });
                           },
@@ -242,12 +262,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     ),
                   )
                 ),
-              // Flexible(
-              //   child: IndexedStack(
-              //     index: _currentIndex,
-              //     children: _pages,
-              //   )
-              // )
+              
               ],
             ),
           )
@@ -257,20 +272,66 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 }
 
-
-class CircularIndicator extends StatelessWidget {
- 
+class DeviceCirleIndicator extends StatefulWidget {
+  
   final String title;
   final String valueText;
+  final String unitText;
+  final bool isActive;
   final Color color;
-  CircularIndicator({
+  DeviceCirleIndicator({
     Key?key,
     required this.title,
     required this.valueText,
+    required this.unitText,
+    required this.isActive,
     required this.color
   }) : super(key: key);
 
+  @override
+  State<DeviceCirleIndicator> createState() => _DeviceCirleIndicatorState();
+}
 
+class _DeviceCirleIndicatorState extends State<DeviceCirleIndicator> {
+  late String curentFlow;
+  late IO.Socket socket;
+  
+  
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    curentFlow = widget.valueText;
+    dataReceiver();
+  }
+   void dataReceiver() {
+    socket = IO.io('${SocketConstant.socket_url}', // kết nối cùng wife với dt và dùng ip config de lay address
+      IO.OptionBuilder()
+      .setTransports(['websocket'])
+      .enableReconnection()  // Kích hoạt reconnect tự động // for Flutter or Dart VM
+      .build());
+      
+      socket.connect();
+      socket.on('connection', (_) {
+      print('Kết nối thành công');
+      });
+       socket.on('connect_error', (error) {
+        print('Lỗi kết nối: $error');
+      });
+      socket.on('mqtt_data', (data) {
+        print('Tốc độ tức thời: $data');
+        setState(() {
+          curentFlow = data['data'].toString();
+        });
+      });
+  }
+ 
+    @override
+  void dispose() {
+    super.dispose();
+    socket.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -283,25 +344,45 @@ class CircularIndicator extends StatelessWidget {
               height: 100,
               child: CircularProgressIndicator(
                 strokeWidth: 8.0,
-                backgroundColor: color.withOpacity(0.3),
-                color: color,
+                backgroundColor: widget.isActive ? widget.color.withOpacity(0.3) : Colors.grey,
+                color: widget.isActive ? widget.color : Colors.grey,
               ),
             ),
-            Text(
-              valueText,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            )
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  curentFlow,
+                   style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    // color: Colors.black,
+                    color: widget.isActive ? Colors.black : Colors.grey,
+                  ),
+                ),
+                Text(
+                  widget.unitText, // Đơn vị (VD: L/phút)
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: widget.isActive ? Colors.black : Colors.grey,
+                  ), 
+                )
+              ],
+            ),
+            
           ],
         ),
-         SizedBox(height: 20),
-          Text(
-            title,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          )
+        SizedBox(height: 20,),
+            Text(
+              widget.isActive ? widget.title : "Chưa kích hoạt",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,
+              color: widget.isActive ? widget.color : Colors.grey),
+            )
       ],
     );
   }
 }
+
 
 class CircularIndicatorStatus extends StatelessWidget {
   final String title;
@@ -341,7 +422,7 @@ class CircularIndicatorStatus extends StatelessWidget {
            SizedBox(height: 20),
            Text(
             title,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
            ),
            Text(
             isActive ? "Đã Kích hoạt" : "Chưa kích hoạt",

@@ -72,7 +72,8 @@ class _CharacteristicState extends State<CharacteristicTile> {
     try {
       List<int> bytes = _convertInputToBytes(); // Get bytes from input fields
       await c.write(bytes, withoutResponse: c.properties.writeWithoutResponse);
-      Snackbar.show(ABC.c, "Write: Success", success: true);
+      // Snackbar.show(ABC.c, "Write: Success", success: true);
+      Snackbar.show(ABC.c, "Gửi thông tin Wifi thành công", success: true);
       if (c.properties.read) {
         await c.read();
       }
@@ -151,7 +152,7 @@ Widget buildReadButton(BuildContext context) {
   Widget buildWriteButton(BuildContext context) {
     bool withoutResp = widget.characteristic.properties.writeWithoutResponse;
     return TextButton(
-        child: Text(withoutResp ? "WriteNoResp" : "Write"),
+        child: Text(withoutResp ? "WriteNoResp" : "Gửi thông tin"),
         onPressed: () async {
           await onWritePressed();
           if (mounted) {

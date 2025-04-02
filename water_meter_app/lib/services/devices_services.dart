@@ -12,10 +12,19 @@ class DevicesServices {
   required String user_id,
   required String location,
   required String type,
+  required String longitude,
+  required String latitude,
   }) async{
+    try {
       final device = Provider.of<DeviceProvider>(context, listen: false);
-      final url = Uri.parse('${ApiConstant.baseUrl}/api/water/create');
-      
+      final url = Uri.parse('${ApiConstant.baseUrl}/water/api/create');
+      print("📌 Dữ liệu gửi lên: ${jsonEncode({
+        'user_id': user_id,
+        'location': location,
+        'deviceType': type,
+        'longitude': longitude,
+        'latitude': latitude,
+      })}");
       final res = await http.post(
         url,
          headers: <String, String>{
@@ -25,18 +34,12 @@ class DevicesServices {
           'user_id': user_id,
           'location': location,
           'deviceType': type,
+          'longitude': longitude,
+          'latitude': latitude,
         }),
       );
-      if(res.statusCode == 200) {
-          print('Tạo thành công');
-          print('Nhận được từ server ${res.body}');
-          //return Devices.fromJson(res.body);
-          device.setDevice(res.body);
-          //return Devices.fromJson(res.body);
-      }
-      else {
-        throw Exception('Failed to create Devices.');
-      }
+      print('${res.body}');
+       print('Status code: ${res.statusCode}');
       httpErrorHandle(
         response: res,
         context: context,
@@ -51,11 +54,14 @@ class DevicesServices {
               duration: const Duration(seconds: 2),
             )
           );
-
           // set devide for provider
           device.setDevice(res.body);
         });
+    } catch (e) {
+      showSnackBar(context, e.toString());
+      print("error: ${e}");
     }
+  }
 
   Future<Devices> getDeviceByUserId(String user_id) async{
     final url = Uri.parse('${ApiConstant.baseUrl}/api/device/getByUserId/$user_id');

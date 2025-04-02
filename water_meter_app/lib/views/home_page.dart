@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:water_meter_app/services/auth_services.dart';
 import 'package:water_meter_app/views/home.dart';
 import 'package:water_meter_app/views/notification_page.dart';
-import 'package:water_meter_app/views/profile_page.dart';
 import 'package:water_meter_app/views/setting_page.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,13 +22,6 @@ class _HomePageState extends State<HomePage> {
   ];
 
 
-  // tiêu đề
-  // final List<String> _titles = [
-  //   "Trang chủ",
-  //   "Thông báo",
-  //   "Cài đặt"
-  // ];
-
   final AuthServices authServices = AuthServices();
 
   @override 
@@ -40,42 +32,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //    title:  Text(_titles[currentIndex]),
-      //   actions: [
-      //     Padding(
-      //        padding: const EdgeInsets.all(10.0),
-      //       child: PopupMenuButton<String>(
-      //         onSelected: (value) {
-      //             if(value == 'profile') {
-      //               Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(builder: (context) => const ProfilePage()));
-
-      //             }else if(value == 'logout') {
-      //               authServices.signOut(context);
-      //             }
-      //         },
-      //         itemBuilder: (BuildContext context) => [
-      //           PopupMenuItem(
-      //             value: 'profile',
-      //             child: Text('Xem profile'),
-      //           ),
-      //           PopupMenuItem(
-      //             value: 'logout',
-      //             child: Text('Đăng xuất'),
-      //           ),
-      //         ],
-      //         child: CircleAvatar(
-      //           radius: 20,
-      //           backgroundImage: AssetImage('assets/images/profile.jpg'
-      //           ),
-      //           child: Icon(Icons.person),
-      //         ),
-      //       ),
-      //     )
-      //   ],
-      // ),
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,

@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:water_meter_app/providers/user_provider.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -11,6 +13,28 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
+    final List<Map<String, dynamic>> notification = [
+      {
+        "UserId": "Vũ",
+        "title": "Thông báo",
+        "icone": Icons.notification_add,
+        "description": "Đã lắp đặt thiết bị thành công!",
+        "date": "12/12/2024",
+        "time" : "12:3",
+        "type": "Thông báo"
+      },
+       {
+        "UserId": "Vũ",
+        "title": "Cảnh báo",
+        "icone": Icons.warning,
+        "description": "Xuất hiện rò rỉ nước",
+        "date": "12/12/2024",
+        "time" : "12:3",
+        "type": "Cảnh báo"
+      }
+    ];
     return Scaffold(
      appBar: PreferredSize(
         preferredSize: Size.fromHeight(70), // Chỉ định chiều cao cho AppBar
@@ -66,8 +90,66 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         ),
      ),
-     body: Container(
-
+     body: ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: notification.length,
+      itemBuilder:(context,index) {
+        final notify = notification[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          child: Card(
+            color: notify["type"] == "Cảnh báo"
+                      ? Colors.red[100]
+                      : Colors.green[100],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: CircleAvatar(
+                  backgroundColor: notify["type"] == "Cảnh báo"
+                      ? const Color.fromARGB(255, 224, 33, 52)
+                      : const Color.fromARGB(255, 4, 124, 40),
+                  child: Icon(notify["icone"], color: Colors.white),
+                  ),
+                  title: Text(
+                    notify["title"],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: notify["type"] == "Cảnh báo"
+                          ? Colors.red
+                          : Colors.green,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notify["description"],
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                        "Ngày: ${notify["date"]} | Giờ: ${notify["time"]}",
+                        style: const TextStyle(fontSize: 16, color: Color.fromARGB(255, 114, 114, 114)),
+                      ),
+                    const SizedBox(width: 8),
+                  ],
+                ),
+                SizedBox(height: 8,)
+              ],
+            ),
+          )
+        );
+      }
      ),
     );
   }

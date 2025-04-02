@@ -9,6 +9,8 @@ class DeviceProvider  extends ChangeNotifier{
     deviceType: '',
     bateryLevel: 100,
     status: false,
+    longitude: '',
+    latitude: '',
     create_at: DateTime.now(),
     );
 
@@ -25,6 +27,15 @@ class DeviceProvider  extends ChangeNotifier{
   void setDeviceName(String name) {
     _deviceName = name;
     notifyListeners(); // Thông báo cho các widget lắng nghe trạng thái
+  }
+
+  String _currentFlowRate = "";
+
+  String get currentFlowRate => _currentFlowRate;
+
+  void updateFlowRate(String newFlowRate) {
+    _currentFlowRate = newFlowRate;
+    notifyListeners();
   }
   String formatCreateAt() {
      final DateTime dateTime = _device.create_at ?? DateTime.now();  // Cung cấp giá trị mặc định nếu create_at là null

@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:water_meter_app/views/billpayment_pape.dart';
 import 'package:water_meter_app/views/change_notify_page.dart';
 import 'package:water_meter_app/views/change_theme_page.dart';
 import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/views/logout_page.dart';
 import 'package:water_meter_app/views/notification_page.dart';
+import 'package:water_meter_app/views/picker_page.dart';
 import 'package:water_meter_app/views/profile_page.dart';
+import 'package:water_meter_app/views/takePicture_page.dart';
 import 'package:water_meter_app/views/update_infor.dart';
+
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -16,10 +22,11 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   int _currentIndex = 0;
-
+  
   final List<String> menuItems = [
     'Thông tin người dùng',
     'Cảnh báo',
+    'Cập nhật hóa đơn',   
     'Change Theme',
     'Đăng xuất',
   ];
@@ -27,6 +34,7 @@ class _SettingPageState extends State<SettingPage> {
   List<IconData> menuIcons = [
     Icons.person_2_outlined, // Icon cho mục 1
     Icons.notification_add_rounded, // Icon cho mục 2
+    Icons.payment,
     Icons.color_lens,
     Icons.logout,
 ];
@@ -34,6 +42,7 @@ class _SettingPageState extends State<SettingPage> {
   final List<Widget> _pages = [
     ProfilePage(),
     UpdateInforPage(),
+    PickerPage(),
     ProfilePage(),
     LoginPage(),
   ];

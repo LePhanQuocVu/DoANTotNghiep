@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:ffi';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
+// import 'dart:ffi';
+// import 'package:flutter/foundation.dart';
+// import 'package:http/http.dart';
 
 class Devices {
   final String id;
@@ -12,8 +12,11 @@ class Devices {
   final int? bateryLevel;
   // final String? image;
   // final String deviceName;
-   final DateTime? create_at;
-
+  final String longitude;
+  final String latitude;
+  final DateTime? create_at;
+  final DateTime? update_at;
+  
   Devices({
     required this.id,
     required this.user_id,
@@ -21,9 +24,12 @@ class Devices {
     required this.deviceType,
     this.status,
     this.bateryLevel,
+    required this.longitude,
+    required this.latitude,
     // this.image,
     // required this.deviceName,
     this.create_at,
+    this.update_at,
   });
 
   Map<String,dynamic> toMap() {
@@ -34,7 +40,10 @@ class Devices {
       'type': deviceType,
       'status': status,
       'bateryLevel': bateryLevel,
-      
+      'longitude': longitude,
+      'latitude': latitude,
+      'create_at': create_at,
+      'update_at': update_at
     };
   }
 
@@ -48,9 +57,14 @@ class Devices {
       deviceType: map['deviceType'] as String,
       status: map['status'] != null ? map['status'] as bool : null, // Kiểm tra null
       bateryLevel: map['bateryLevel'] != null ? map['bateryLevel'] as int : null, // Kiểm tra null
+      longitude: map['longitude'] != null ? map['longitude']  as String : '',
+      latitude: map['latitude'] != null ? map['latitude'] as String : '',
       create_at: map['create_at'] != null
             ? DateTime.parse(map['create_at'] as String)
             : null, // Chuyển đổi chuỗi ngày giờ thành DateTime
+      update_at: map['update_at'] != null
+            ? DateTime.parse(map['update_at'] as String)
+            : null, // Chuyển đổi chuỗi ngày giờ thành DateTime      
     );
   }
   String toJson() => json.encode(toMap());

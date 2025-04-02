@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:water_meter_app/providers/device_provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
-import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/views/home_page.dart';
+import 'package:water_meter_app/views/login_page.dart';
+// import 'package:water_meter_app/views/home_page.dart'                ;
 import 'package:provider/provider.dart';
 // import './views/home_page.dart';
 void main() {

@@ -11,15 +11,15 @@ import '../../widgets/descriptor_tile.dart';
 import 'dart:async';
 
 
-class DevicesPage extends StatefulWidget {
+class DeviceBlePage extends StatefulWidget {
   final BluetoothDevice device;
-  const DevicesPage({super.key, required this.device});
+  const DeviceBlePage({super.key, required this.device});
 
   @override
-  State<DevicesPage> createState() => _DevicesPageState();
+  State<DeviceBlePage> createState() => _DevicesBlePageState();
 }
 
-class _DevicesPageState extends State<DevicesPage> {
+class _DevicesBlePageState extends State<DeviceBlePage> {
 
    int? _rssi;
   int? _mtuSize;
@@ -180,12 +180,12 @@ class _DevicesPageState extends State<DevicesPage> {
     );
   }
 
-  // Widget buildRemoteId(BuildContext context) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(8.0),
-  //     child: Text('${widget.device.remoteId}'),
-  //   );
-  // }
+  Widget buildRemoteId(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text('${widget.device.remoteId}'),
+    );
+  }
 
   Widget buildRssiTile(BuildContext context) {
     return Column(
@@ -203,12 +203,7 @@ class _DevicesPageState extends State<DevicesPage> {
       children: <Widget>[
         TextButton(
           onPressed: onDiscoverServicesPressed,
-          child: const Text("Lấy thông tin",
-          style: TextStyle(
-            fontSize:16,
-            color: Colors.blue, 
-          ),
-          ),
+          child: const Text("Lấy thông tin"),
         ),
         const IconButton(
           icon: SizedBox(
@@ -225,7 +220,7 @@ class _DevicesPageState extends State<DevicesPage> {
   }
    Widget buildMtuTile(BuildContext context) {
     return ListTile(
-        title: const Text('Size mật khẩu'),
+        title: const Text('MTU Size'),
         subtitle: Text('$_mtuSize bytes'),
         trailing: IconButton(
           icon: const Icon(Icons.edit),
@@ -257,16 +252,14 @@ Widget buildConnectButton(BuildContext context) {
         body: SingleChildScrollView(
             child: Column(
               children: [
-               // buildRemoteId(context),
+                buildRemoteId(context),
               ListTile(
                 leading: buildRssiTile(context),
-                title: Text('Trạng thái: ${_connectionState.toString().split('.')[1]}.',
-                style: TextStyle(
-                  fontSize: 16
-                ),),
+                title: Text('Trạng thái:  ${_connectionState.toString().split('.')[1]}.'),
                 trailing: buildGetServices(context),
               ),
               buildMtuTile(context),
+              
               ..._buildServiceTiles(context, widget.device),
               ],
             ),
