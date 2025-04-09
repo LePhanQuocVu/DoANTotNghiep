@@ -8,7 +8,8 @@ const userSchema = new Schema({
     password: { type: String, require: true},
     age: { type: Number, default: null },  
     phone: {type: String,  default: null },
-    address: {type: String,  default: null},
+    address: {type: String,  default: null}, 
+    fcmToken: {type: String, default: null},         
     create_at: {type: Date, default: Date.now}
 });
 

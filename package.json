@@ -27,6 +27,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "firebase-admin": "^13.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.0",
     "mqtt": "^5.10.3",

@@ -4,19 +4,12 @@ var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/UserModel');
+const { getMessaging } = require('firebase-admin/messaging');
+const { messaging } = require('firebase-admin');
+
+const { sendNotification } = require('../helper/sendNotify');
+
 class UserController {
-    // GET ALL USER
-    getAllUsers = async (req, res) => {
-        try{
-            const users = await User.find({});
-            if(users.length == 0) {
-                return res.status(400).json({msg: "No user!"});
-            }
-            return res.status(200).json(users);
-        }catch(err){
-            return res.status(500).json(err);
-        }
-    }
     // get UserbyID
     getUserById = async (req,res) => {
         try {
@@ -85,7 +78,7 @@ class UserController {
             }
 
             const token = jwt.sign({id: user._id}, "passwordKey");
-            return res.status(200).json({token, ...user._doc});
+             res.status(200).json({token, ...user._doc});
            // res.json({token, ...user._doc});
 
         }catch(e) {
@@ -139,12 +132,49 @@ class UserController {
         }
     }
 
-    updateFirmware = async () => {
-        try{
+    // updateFirmware = async () => {
+    //     try{
             
-        } catch (e) {
-            res.status(500).json({ error: e.message});
+    //     } catch (e) {
+    //         res.status(500).json({ error: e.message});
+    //     }
+    // }
+
+    updateFcmToken = async (req,res) => {
+        const objectId = new mongoose.Types.ObjectId(req.params.userId);
+        const {fcmToken} = req.body;
+        if (!mongoose.Types.ObjectId.isValid(objectId)) {
+            return res.status(400).json({ message: 'ID người dùng không hợp lệ.' });
         }
+        if (!fcmToken) {
+            return res.status(400).json({ message: 'FCM token là bắt buộc.' });
+          }
+        try {
+            const user = await User.findByIdAndUpdate(objectId, {fcmToken: fcmToken}, {new: true});
+            if (!user) {
+                return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+              }
+            
+            res.status(200).json({
+                message: 'FCM token đã được cập nhật thành công.',
+                user,
+            });
+            
+        } catch(error) {
+            res.status(400).json({msg: error});
+            console.log('Error updateFCM Token: ' + error);
+        }
+    }
+
+    notification = async (req, res) => {
+        const fcmToken =  "fO63d7m0S3KLP2TT2osnsp:APA91bE7w0-icFdMhNxkf0QpaGiFvTOJnNyccmnfkHqk90ftXLbiv2S-dw9bGV35sC69rRVH6dIOFBopotUR2t5lU78EFYD2QJLScGwoHt1AiCG8rnJS_kc";
+       try {
+        await sendNotification(fcmToken, "Thông báo", "Đã thêm mới thiết bị");
+        res.status(200).json({ message: 'Đã gửi thông báo thành công!' });
+        } catch(error) {
+            res.status(500).json({ error: 'Gửi thông báo thất bại!' });
+       }
+       
     }
   
     /** METHOD: PUT ---------- UPDATE INFOR PART 2 -> Not use */

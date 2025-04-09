@@ -4,6 +4,8 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const waterRouter = require('./routes/water');
 const adminRouter = require('./routes/admin');
+const admin = require('./config/firebase');
+
 const { Server } = require("socket.io");
 const { createServer } = require('http');
 
@@ -11,11 +13,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./config/db');
 const mqttController = require('./controllers/MqttController');
+const { getMessaging } = require('firebase-admin/messaging');
 
 // Tạo ứng dụng Express
 const app = express();
 const server = createServer(app); // Tạo HTTP server
 const io = new Server(server);   // Tạo Socket.IO server
+
 
 // Kết nối database
 db.connectDB();

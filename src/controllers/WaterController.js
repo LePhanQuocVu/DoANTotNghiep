@@ -1,10 +1,9 @@
-
 const { json } = require('express');
-// const Water = require('../models/WaterMeterModel');
 const WaterMeter = require('../models/WaterMeterModel');
-
+const User = require('../models/UserModel');
 const Notification = require('../models/NotificationModel');
 const mongoose = require('mongoose');
+const { sendNotification } = require('../helper/sendNotify');
 
 class WaterController {
     
@@ -32,6 +31,8 @@ class WaterController {
             if(!waterDevice) {
                 return res.status(400).json({msg: "Không thể tạo thiết bị!"});
             } 
+            // Create devce and update to MongoDB
+
             const newNotify = new Notification({
                 userId: user_id,
                 title: "Tạo mới thành công!",
@@ -39,10 +40,18 @@ class WaterController {
                 type: "infor",
                 isRead: false
             });
-            
-            return res.status(200).json(waterDevice);
+
+            // Save to mongo
+            /**Todo */
+
+            // send tofication to FCM 
+            const user = await User.findById(user_id).select('fcmToken');// laytoken tu device
+            const fcmToken = user.fcmToken;
+            console.log('FCM token get from user to push notify: '  + user.fcmToken); 
+            await sendNotification(fcmToken, "Thông báo", "Tạo thiết bị thành công!");
+            res.status(200).json(waterDevice);
         } catch(e) {
-            console.log(e);
+            console.log(`Loi: ${e}`);
             return res.status(500).json({msg: "Error from Server"});
         }
     } 
