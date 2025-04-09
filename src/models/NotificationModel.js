@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const notifySchema = Schema({
+const notifySchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
@@ -19,7 +19,7 @@ const notifySchema = Schema({
     type: {
         type: String,
         enum: ['alert', 'warning', 'infor'],
-        default: 'info'
+        default: 'infor'
     },
     isRead: {
         type: Boolean,
@@ -27,4 +27,5 @@ const notifySchema = Schema({
     },
 }, {timestamps: true});
 
-module.exports = mongoose.model("notifications",notifySchema);
+const Notification= mongoose.model("notifications",notifySchema);
+module.exports = Notification;

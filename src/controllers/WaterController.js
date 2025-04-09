@@ -43,7 +43,10 @@ class WaterController {
 
             // Save to mongo
             /**Todo */
-
+            const newNotification = await newNotify.save();
+            if(!newNotification) {
+                res.status(400).json({msg: "Lưu không thành công"})
+            }
             // send tofication to FCM 
             const user = await User.findById(user_id).select('fcmToken');// laytoken tu device
             const fcmToken = user.fcmToken;
@@ -125,6 +128,38 @@ class WaterController {
         }
     }
 
+    deleteDevice = async (req,res) => {
+        try {
+            const userId = req.params.id;
+    
+            if (!userId) {
+                return res.status(400).json({ msg: "Thiếu userId để xoá thiết bị!" });
+            }
+    
+            // Tìm và xoá tất cả thiết bị có userID
+            const result = await WaterMeter.deleteMany({ user_id: userId });
+    
+            if (result.deletedCount === 0) {
+                return res.status(404).json({ msg: "Không tìm thấy thiết bị để xoá!" });
+            }
+    
+            // Ghi log hoặc gửi thông báo nếu cần
+            const newNotify = new Notification({
+                userId: userId,
+                title: "Xoá thiết bị",
+                message: "Thiết bị đã được xoá thành công!",
+                type: "warning",
+                isRead: false
+            });
+    
+            await newNotify.save();
+    
+            return res.status(200).json({ msg: `Đã xoá ${result.deletedCount} thiết bị.` });
+        } catch (e) {
+            console.error('Lỗi xoá thiết bị: ', e);
+            return res.status(500).json({ msg: "Lỗi máy chủ khi xoá thiết bị." });
+        }
+    }
     
     getDataByDay = async (req,res) => {
         try {

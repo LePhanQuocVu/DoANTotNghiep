@@ -8,7 +8,7 @@ var WaterController = require('../controllers/WaterController');
 waterRouter.post('/api/create', WaterController.createDevice);
 waterRouter.put('/api/update/:id', WaterController.updateDevice);
 waterRouter.get('/api/getDeviceByUserId/:id', WaterController.getDeviceByUserId);
-
+waterRouter.delete('/api/deleteDevice/:id', WaterController.deleteDevice);
 /** HISTORY */
 
 waterRouter.get('/api/device/daily/:id', WaterController.getDataByDay);
