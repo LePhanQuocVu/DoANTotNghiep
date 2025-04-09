@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:water_meter_app/services/auth_services.dart';
+import 'package:water_meter_app/services/user_services.dart';
 import './register_page.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthServices authServices = AuthServices();
+   final UserServices userServices = UserServices();
   bool _obscurePassword = true;
 
   final _formkey = GlobalKey<FormState>();
@@ -105,11 +107,9 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: (){
+                    onPressed: () {
                       if(_formkey.currentState!.validate()) {
-                         authServices.signInUser(context: context, email: _emailController.text, password: _passwordController.text);
-                        // show nnack bar succss
-                        
+                          authServices.signInUser(context: context, email: _emailController.text, password: _passwordController.text);
                       }
                     } ,
                   child: const Text("Đăng nhập"),

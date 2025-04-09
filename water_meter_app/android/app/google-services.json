@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "334153435762",
+    "project_id": "water-notification-f6724",
+    "storage_bucket": "water-notification-f6724.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334153435762:android:d56b2907c6d3daad4910eb",
+        "android_client_info": {
+          "package_name": "com.example.water_meter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ4MXIe7kd0Ehhg0JUiu3NrTe56yiXtAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

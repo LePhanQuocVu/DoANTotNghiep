@@ -6,13 +6,17 @@ import 'package:water_meter_app/models/usersModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:water_meter_app/providers/user_provider.dart';
 import 'package:water_meter_app/services/api_constant.dart';
+import 'package:water_meter_app/services/user_services.dart';
+import 'package:water_meter_app/utils/global.dart';
 
 import 'package:water_meter_app/views/home_page.dart';
 import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/widgets/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:water_meter_app/services/notification_service.dart';
 class AuthServices {
-
+  
+  final UserServices userServices = UserServices();
  /* SIGN UP */
   void signUpUser({
     required BuildContext context,
@@ -89,7 +93,9 @@ class AuthServices {
     );
         print('${res.body}');
        print('Status code: ${res.statusCode}');
-  
+       
+        final responseData = jsonDecode(res.body);
+        final userId = responseData['_id']; // 🔑 Lấy id từ JSON response
     httpErrorHandle(
       response: res,
       context: context,
@@ -105,10 +111,13 @@ class AuthServices {
               duration: const Duration(seconds: 2),
             )
           );
+           await NotificationService.instance.initialize();
+          print('FCM token Global: ${fcmToken}');
+          print('Update FcmToken to userId: ${userId}');
+          userServices.updateFcmToken(context: context, userId: userId, fcmToken: fcmToken);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
        }
       );
-
   } catch(e) {
      showSnackBar(context, e.toString());
       print("error: ${e}");

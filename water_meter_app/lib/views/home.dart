@@ -137,7 +137,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     ),
                     ],
                   ),
-                   
                 ],
               ),
               SizedBox(height: 30,),  

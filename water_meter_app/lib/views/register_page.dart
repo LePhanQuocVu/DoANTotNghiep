@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:water_meter_app/services/auth_services.dart';
+import 'package:water_meter_app/services/user_services.dart';
 import 'package:water_meter_app/widgets/utils.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -14,7 +15,6 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   final AuthServices authServices = AuthServices();
-
   // void registerUser(BuildContext context) {
   //   // authServices.signUpUser(context: context, email: _emailController.text, password: _passwordController.text, name: _nameController.text);
   // }
@@ -165,6 +165,7 @@ class RegisterPage extends StatelessWidget {
                       if(_formkey.currentState?.validate() ?? false) {
                         try {
                           authServices.signUpUser(context: context, email: _emailController.text, password: _passwordController.text, name: _nameController.text);
+                        
                         }
                         catch (e){
                             print('Đăng kí thất bại');

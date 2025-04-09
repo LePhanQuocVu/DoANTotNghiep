@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:water_meter_app/models/devicesModel.dart';
 import 'package:water_meter_app/providers/device_provider.dart';
 import 'package:water_meter_app/services/api_constant.dart';
+import 'package:water_meter_app/utils/global.dart';
 import 'package:water_meter_app/widgets/utils.dart';
 import 'package:http/http.dart' as http;
 class DevicesServices {
@@ -43,7 +44,7 @@ class DevicesServices {
       httpErrorHandle(
         response: res,
         context: context,
-        onSuccess: () {
+        onSuccess: () async {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
@@ -52,11 +53,15 @@ class DevicesServices {
               ),
               backgroundColor: const Color.fromARGB(255, 70, 140, 231), 
               duration: const Duration(seconds: 2),
-            )
+            ),
+           
           );
           // set devide for provider
           device.setDevice(res.body);
+         
+          // await updateFcmToken(context, )
         });
+
     } catch (e) {
       showSnackBar(context, e.toString());
       print("error: ${e}");

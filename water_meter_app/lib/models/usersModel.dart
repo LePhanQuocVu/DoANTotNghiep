@@ -10,7 +10,7 @@ class User {
   final String? address;
   final String? image;
   final String? token;
-
+  final String? fcmToken;
   User({
     required this.id,
     required this.name,
@@ -20,6 +20,7 @@ class User {
     this.address,
      this.image,
     this.token,
+    this.fcmToken
     }
   );
 
@@ -33,6 +34,7 @@ class User {
       'address': address,
       'image': image,
       'token': token,
+      'fcmToken': fcmToken
     };
   }
 
@@ -47,6 +49,7 @@ class User {
       address: map['address'] != null ? map['address'] as String : null, // Kiểm tra null
       image: map['image'] != null ? map['image'] as String : null, // Kiểm tra null
       token: map['token'] as String,
+      fcmToken: map['fcmToken'] != null ? map['fcmToken'] as String : null
     );
   }
 

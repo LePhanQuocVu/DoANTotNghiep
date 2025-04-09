@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
@@ -11,6 +12,38 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+ 
+  @override
+  void initState() {
+    super.initState();
+    getDeviceToken();
+  }
+
+  void getDeviceToken() async {
+    final notificationSettings = await FirebaseMessaging.instance.requestPermission(provisional: true);
+
+    // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (apnsToken != null) {
+    // APNS token is available, make FCM plugin API requests...
+      print('APNS token: ${apnsToken}');
+    }
+    // Send this token to your backend
+
+    FirebaseMessaging.instance.onTokenRefresh
+    .listen((fcmToken) {
+      // TODO: If necessary send token to application server.
+
+      // Note: This callback is fired at each app startup and whenever a new
+      // token is generated.
+    })
+    .onError((err) {
+      // Error getting token.
+    });
+    await FirebaseMessaging.instance.setAutoInitEnabled(true);
+  }
+  
+ 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
