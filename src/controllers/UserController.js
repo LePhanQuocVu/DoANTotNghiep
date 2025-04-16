@@ -4,6 +4,7 @@ var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/UserModel');
+const Notification = require('../models/NotificationModel');
 const { getMessaging } = require('firebase-admin/messaging');
 const { messaging } = require('firebase-admin');
 
@@ -64,7 +65,7 @@ class UserController {
             const { email, password } = req.body;
             console.log(req.body);
             const user = await User.findOne({email});
-
+            console.log(`Dang nhap: ${user}`);
             if(!user) {
                 return res
                 .status(400)
@@ -78,6 +79,12 @@ class UserController {
             }
 
             const token = jwt.sign({id: user._id}, "passwordKey");
+
+            //  // send tofication to FCM 
+            //     const userToken = await User.findById(user_id).select('fcmToken');// laytoken tu device
+                const userToken = user.fcmToken;
+                console.log('FCM token get from user to push notify: '  + userToken); 
+                await sendNotification(userToken, "Thông báo", "Dang nhap thành công!");
              res.status(200).json({token, ...user._doc});
            // res.json({token, ...user._doc});
 
@@ -166,16 +173,29 @@ class UserController {
         }
     }
 
-    notification = async (req, res) => {
-        const fcmToken =  "fO63d7m0S3KLP2TT2osnsp:APA91bE7w0-icFdMhNxkf0QpaGiFvTOJnNyccmnfkHqk90ftXLbiv2S-dw9bGV35sC69rRVH6dIOFBopotUR2t5lU78EFYD2QJLScGwoHt1AiCG8rnJS_kc";
-       try {
-        await sendNotification(fcmToken, "Thông báo", "Đã thêm mới thiết bị");
-        res.status(200).json({ message: 'Đã gửi thông báo thành công!' });
-        } catch(error) {
-            res.status(500).json({ error: 'Gửi thông báo thất bại!' });
-       }
-       
+    getAllNotifications = async(req,res) => {
+        try {
+            const userId = new mongoose.Types.ObjectId(req.params.userId);
+    
+            if (!userId) {
+                return res.status(400).json({ msg: "Bad request: thiếu userId" });
+            }
+    
+            const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    
+            if (!notifications || notifications.length === 0) {
+                return res.status(200).json({ message: "Không có thông báo nào", notifications: [] });
+            }
+    
+            return res.status(200).json({ message: "Lấy thông báo thành công", notifications });
+        } catch (error) {
+            console.log("Lỗi lấy tất cả thông báo: " + error);
+            return res.status(500).json({ msg: "Lỗi server", error: error.message });
+        }
+        
+ 
     }
+   
   
     /** METHOD: PUT ---------- UPDATE INFOR PART 2 -> Not use */
     // updateUser = async (req, res) => {

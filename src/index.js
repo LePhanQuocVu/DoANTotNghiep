@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const accessToken = '6mT5gue0VvOMQv6B1biX'; // Thay bằng token của thiết bị thật
 
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
@@ -12,13 +14,29 @@ const { createServer } = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./config/db');
-const mqttController = require('./controllers/MqttController');
+ const mqttController = require('./controllers/MqttController');
 const { getMessaging } = require('firebase-admin/messaging');
 
 // Tạo ứng dụng Express
 const app = express();
 const server = createServer(app); // Tạo HTTP server
 const io = new Server(server);   // Tạo Socket.IO server
+
+const data = JSON.stringify({
+  tempesrature: 25
+});
+
+// const options = {
+//   hostname: 'app.coreiot.io',
+//   port: 80,
+//   path: `/api/v1/${accessToken}/telemetry`,
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'Content-Length': data.length
+//   }
+// };
+
 
 
 // Kết nối database
@@ -44,10 +62,10 @@ app.use('/', (req, res) => {
 });
 
 
-// Truyền `io` vào `mqttController`
+//Truyền `io` vào `mqttController`
 mqttController.initialize(io);
 
-// Socket.IO event handler
+// Socket.IO event handler//
 io.on('connection', (socket) => {
   console.log('A user connected');
   socket.on('mode_selected', (mode) => {
@@ -56,6 +74,22 @@ io.on('connection', (socket) => {
     mqttController.publishToMQTT(topic, mode);
   });
 });
+
+// const req = http.request(options, res => {
+//   console.log(`✅ Status: ${res.statusCode}`);
+//   console.log('kết nối core IOT thành công!');
+//   res.on('data', d => {
+//     process.stdout.write(d);
+//   });
+// });
+
+// req.on('error', error => {
+//   console.error('❌ Lỗi gửi dữ liệu:', error);
+// });
+
+// req.write(data);
+// req.end();
+
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;

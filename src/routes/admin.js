@@ -2,7 +2,7 @@ const express = require('express');
 const adminRouter = express.Router();
 
 // var  UserController = require('../controllers/UserController');
-var WaterController = require('../controllers/WaterController');
+const { waterController } = require('../controllers/WaterController');
 
 // var AdminController = require('../controllers/AdminController') 
 var UserController = require('../controllers/UserController');
@@ -13,6 +13,6 @@ adminRouter.get('/api/getAllUsers', AdminController.getAllUsers);
 
 /********** ADMIN */
 /**Devices */
-adminRouter.get('/api/getAllDevices', WaterController.getAllDevices);
+adminRouter.get('/api/getAllDevices', waterController.getAllDevices);
 
 module.exports = adminRouter;

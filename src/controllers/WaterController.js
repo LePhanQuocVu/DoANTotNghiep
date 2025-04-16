@@ -4,12 +4,16 @@ const User = require('../models/UserModel');
 const Notification = require('../models/NotificationModel');
 const mongoose = require('mongoose');
 const { sendNotification } = require('../helper/sendNotify');
-
+const { hashToken } = require('../helper/hashAccessToken');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const CoreIOTClient = require('../controllers/CoreIotController');
+let coreIOTClientInstance = null;
 class WaterController {
     
     createDevice = async(req, res) => {
         try{
-            const {user_id, deviceType, location, status, longitude, latitude} = req.body;
+            const {user_id, deviceType, location, status, longitude, latitude, iotToken} = req.body;
             if(!user_id) {
                 return res.status(400).json({msg: "Bad Request, User_id required"});
             }
@@ -18,15 +22,21 @@ class WaterController {
                 return res.status(400).json({msg: "User đã cài đặt thiết bị!"});
             }
 
+            // const hashedToken = await hashToken(iotToken);
             // create waterDevice
             const newDevice = new WaterMeter({
                 deviceType: deviceType, // loại đồng hồ
                 user_id: user_id, // Lấy user_id từ req.body
                 location: location, //location
-                status: status || false, // Default là false
+                status: status || true, // Default là false
                 longitude: longitude,
                 latitude: latitude,
+                iotToken: iotToken || null,
             });
+
+            // // connect to CoreIOT
+            // coreIOTClientInstance = new CoreIOTClient(iotToken);
+            console.log(`CorreIOT Instance: ${coreIOTClientInstance}`);
             const waterDevice = await newDevice.save();
             if(!waterDevice) {
                 return res.status(400).json({msg: "Không thể tạo thiết bị!"});
@@ -101,7 +111,6 @@ class WaterController {
             const deviceId = req.params.id;
             console.log(deviceId);
             const {deviceType, location, status, longitude, latitude} = req.body;
-           
             const device =  await WaterMeter.findById(deviceId).select('-data');
             if(!device) {
                 return res.status(400).json({msg: "Device not exit"});
@@ -154,7 +163,7 @@ class WaterController {
     
             await newNotify.save();
     
-            return res.status(200).json({ msg: `Đã xoá ${result.deletedCount} thiết bị.` });
+            return res.status(200).json({ msg: `User Đã xoá ${result.deletedCount} thiết bị.` });
         } catch (e) {
             console.error('Lỗi xoá thiết bị: ', e);
             return res.status(500).json({ msg: "Lỗi máy chủ khi xoá thiết bị." });
@@ -267,5 +276,7 @@ class WaterController {
     }
 }
 
-
-module.exports = new WaterController;
+module.exports = {
+    waterController: new WaterController(),
+    getCoreIOTClientInstance: () => coreIOTClientInstance,
+};

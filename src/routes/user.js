@@ -17,9 +17,9 @@ userRouter.put("/api/update/:id", UserController.updateUser);
 
 // udpate fcmToken
 userRouter.put("/api/:userId/updateFcmToken", UserController.updateFcmToken);
-// postNotification
 
-userRouter.post("/api/notification", UserController.notification);
+/** NOTIFICATION */
 
+userRouter.get("/api/getAllNotifications/:userId", UserController.getAllNotifications);
 
 module.exports = userRouter;

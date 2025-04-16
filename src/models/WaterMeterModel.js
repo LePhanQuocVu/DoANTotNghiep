@@ -15,6 +15,7 @@ const deviceSchema = new Schema({
     bateryLevel: {type: Number, default: 100}, // 100% batery
     longitude: { type: String, required: true},
     latitude: { type: String, required: true},
+    iotToken: {type: String, required: false},
     data: {
         type: [
             {
