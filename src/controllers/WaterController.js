@@ -76,9 +76,9 @@ class WaterController {
             const devices = await WaterMeter.find().select('-data');
             console.log(devices);
             if(devices.length == 0) {
-                return res.status(400).json({msg: "Chưa có thiết bị cài đặt"});
+                return res.status(200).json({msg: "Chưa có thiết bị cài đặt"});
             }
-            return res.status(200).json(devices);
+            return res.status(200).json({allDevices: devices});
         } catch (e){
             console.log(e);
         }
@@ -274,6 +274,206 @@ class WaterController {
             res.status(500).json({ error: "Lỗi server!" });
         }
     }
+
+    getLocationAllDevices = async(req,res) => {
+        try {
+            const devices = await WaterMeter.find({}, { location: 1, longitude: 1, latitude: 1, _id: 0 });
+            if(devices.length == 0) {
+                res.status(200).json({msg: 'Không thiết bị nào tìm thấy'});
+            } else {
+                res.status(200).json({devicesLocation: devices});
+            }
+        } catch (e) {
+            console.log(`Error get location: ${e}`);
+            res.status(500).json({e: "Server Error get locationtion"});
+        }
+
+    }
+
+    getDataByDate = async(req,res) => {
+
+    }
+
+    getDataHours = async(req,res) => {
+        try {
+            const { id } = req.params;
+            const date = new Date(req.query.date);
+    
+            // Lấy 1 ngày cụ thể
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+            console.log(`id: ${id}`);
+            const device = await WaterMeter.findById(id);
+            if (!device) return res.status(404).json({ message: "Device not found" });
+    
+            // Lọc dữ liệu theo ngày
+            const hourlyData = device.data.filter(d => {
+                const ts = new Date(d.timestamp);
+                return ts >= startOfDay && ts <= endOfDay;
+            }).map(d => ({
+                time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                value: d.value
+            }));
+    
+            res.json(hourlyData);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+
+    getDataDaily = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const selectedDate = new Date(req.query.date); // chỉ truyền 1 ngày
+        
+            if (isNaN(selectedDate)) {
+              return res.status(400).json({ message: "Invalid date format" });
+            }
+        
+            // Tính ngày đầu và cuối tháng từ ngày truyền vào
+            const start = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+            const end = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0); // ngày cuối tháng
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+        
+            const device = await WaterMeter.findById(id);
+            if (!device) return res.status(404).json({ message: "Device not found" });
+        
+            const dailyMap = {};
+        
+            device.data.forEach(d => {
+              const ts = new Date(d.timestamp);
+        
+              if (ts >= start && ts <= end) {
+                const dateStr = ts.toLocaleDateString("en-CA"); // YYYY-MM-DD
+                if (!dailyMap[dateStr]) dailyMap[dateStr] = [];
+                dailyMap[dateStr].push(d.value);
+              }
+            });
+        
+            const dailyData = Object.entries(dailyMap).map(([date, values]) => ({
+              date,
+              value: values.reduce((a, b) => a + b, 0),
+            }));
+        
+            res.json(dailyData);
+          } catch (err) {
+            res.status(500).json({ message: err.message });
+          }
+    }
+
+    getDataWeekly = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const selectedDate = new Date(req.query.date);
+    
+            if (isNaN(selectedDate)) {
+                return res.status(400).json({ message: "Invalid date format" });
+            }
+    
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth(); // 0-indexed (0 = January)
+    
+            const startOfMonth = new Date(year, month, 1);
+            const endOfMonth = new Date(year, month + 1, 0);
+            startOfMonth.setHours(0, 0, 0, 0);
+            endOfMonth.setHours(23, 59, 59, 999);
+    
+            const device = await WaterMeter.findById(id);
+            if (!device) return res.status(404).json({ message: "Device not found" });
+    
+            const weeklyMap = {
+                "Week 1": [],
+                "Week 2": [],
+                "Week 3": [],
+                "Week 4": [],
+                "Week 5": [] // trường hợp tháng có hơn 28 ngày
+            };
+    
+            device.data.forEach(d => {
+                const ts = new Date(d.timestamp);
+    
+                if (ts >= startOfMonth && ts <= endOfMonth) {
+                    const day = ts.getDate();
+    
+                    let weekLabel;
+                    if (day >= 1 && day <= 7) weekLabel = "Week 1";
+                    else if (day >= 8 && day <= 14) weekLabel = "Week 2";
+                    else if (day >= 15 && day <= 21) weekLabel = "Week 3";
+                    else if (day >= 22 && day <= 28) weekLabel = "Week 4";
+                    else weekLabel = "Week 5"; // từ 29 đến hết tháng
+    
+                    weeklyMap[weekLabel].push(d.value);
+                }
+            });
+    
+            // Chỉ trả về các tuần có dữ liệu
+            const weeklyData = Object.entries(weeklyMap)
+                .filter(([_, values]) => values.length > 0)
+                .map(([week, values]) => ({
+                    week,
+                    value: values.reduce((a, b) => a + b, 0)
+                }));
+    
+            res.json(weeklyData);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    };
+    
+
+    getDataMonthly = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const selectedDate = new Date(req.query.date);
+    
+            if (isNaN(selectedDate)) {
+                return res.status(400).json({ message: "Invalid date format" });
+            }
+    
+            const year = selectedDate.getFullYear();
+    
+            const device = await WaterMeter.findById(id);
+            if (!device) return res.status(404).json({ message: "Device not found" });
+    
+            const monthlyMap = {
+                Jan: [],
+                Feb: [],
+                Mar: [],
+                Apr: [],
+                May: [],
+                Jun: [],
+                Jul: [],
+                Aug: [],
+                Sep: [],
+                Oct: [],
+                Nov: [],
+                Dec: []
+            };
+    
+            const monthNames = Object.keys(monthlyMap);
+    
+            device.data.forEach(d => {
+                const ts = new Date(d.timestamp);
+    
+                if (ts.getFullYear() === year) {
+                    const monthIndex = ts.getMonth(); // 0-11
+                    const monthName = monthNames[monthIndex];
+                    monthlyMap[monthName].push(d.value);
+                }
+            });
+    
+            const monthlyData = monthNames.map(month => ({
+                month,
+                value: monthlyMap[month].reduce((a, b) => a + b, 0)
+            }));
+    
+            res.json(monthlyData);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    };
+    
 }
 
 module.exports = {
