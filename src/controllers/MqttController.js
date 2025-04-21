@@ -28,7 +28,7 @@ class MqttController {
   setupListeners() {
     this.client.on('connect', () => {
       console.log('Connected to MQTT broker');
-      const topic = 'datawater/+';
+      const topic = 'data/+';
       this.client.subscribe(topic, (err) => {
         if (err) {
           console.error(`Cannot subscribe to topic: ${err.message}`);
@@ -45,38 +45,42 @@ class MqttController {
         return;
       }
     // connect to CoreIOT
- 
+      
       const userId = topicPicker[1];
 
-      console.log(`Received message for user: ${userId} : ${message.toString()}`);
+      console.log(`Received message for user: ${userId} : ${message}`);
         // Gửi dữ liệu qua socket.io (nếu io đã được khởi tạo) -> flutter
-
-        if (this.io) {
-          this.io.emit(`mqtt_data/${userId}`, { data: message.toString() });
-          console.log(`Đã gửi tới Web Socket!: mqtt_data/${userId}`);
-        }
+      
+       
         // send to coreIOT TODO:
 
         // Lưu dữ liệu vào cơ sở dữ liệu
         try {
-          const flowRate = JSON.parse(message.toString());
+          const payload = JSON.parse(message.toString());
+          const { flowRate, volume, total_monthly } = payload;
+           // Emit flowRate via socket.io
+          if (this.io && typeof flowRate === 'number') {
+            this.io.emit(`mqtt_data/${userId}`, { flowRate });
+            console.log(`Đã gửi tới Web Socket!: mqtt_data/${userId}`);
+          }
+          // const flowRate = JSON.parse(message.toString());
         // save to database
           const device = await WaterMeter.findOne({ user_id: userId });
           console.log(`Move to device: ${device}`);
           const deviceJson = (device);
           var token = device['iotToken'];
-          console.log(`Token: ${token}`); // ✅ sẽ ra lại 'ja1a4dwxgwhwi4oj93m
+          console.log(`Token: ${token}`); //  sẽ ra lại 'ja1a4dwxgwhwi4oj93m
           if (!device) {
             console.error(`No device found for user_id: ${userId}.`);
             return;
           }
-          if (typeof flowRate === 'number' && !isNaN(flowRate)) {
-            device.data.push({ value: flowRate, timestamp: new Date() });
+          if (typeof volume === 'number' && !isNaN(volume)) {
+            device.data.push({ value: volume, timestamp: new Date() });
             this.sendDataToCoreIOT({flowRate: flowRate}, token);
             await device.save();
-            console.log(`✅ Data saved for user_id: ${userId}, value: ${flowRate}`);
+            console.log(` Data saved for user_id: ${userId}, value: ${flowRate}`);
           } else {
-              console.error(`❌ Invalid data received: ${message.toString()}`);
+            console.error(`Invalid volume received: ${volume}`);
               return;
           }
           // console.log(`Device found: ${device}`);
@@ -99,7 +103,7 @@ class MqttController {
   }
   
 
-  // ✅ Hàm gửi dữ liệu đến CoreIOT qua HTTPS
+  //  Hàm gửi dữ liệu đến CoreIOT qua HTTPS
   sendDataToCoreIOT(dataObj, accessToken) {
     const data = JSON.stringify(dataObj);
 
@@ -119,7 +123,7 @@ class MqttController {
       console.log(`🌐 CoreIOT Response Status: ${res.statusCode}`);
       res.on('data', d => psrocess.stdout.write(d));
     });
-    console.log('Req: ', req);
+   
     req.on('error', error => {
       console.error('❌ Lỗi gửi dữ liệu đến CoreIOT:', error);
     });
