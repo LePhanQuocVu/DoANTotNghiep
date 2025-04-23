@@ -82,5 +82,29 @@
     "description": "Up fix bug for data",
     "fileName": "firmware-v0.bin",
     "uploadedAt": "2025-04-21T04:37:08.943Z"
+  },
+  {
+    "version": "v3.2.1",
+    "description": "Thay đổi bản cập nhật",
+    "fileName": "firmware-v0.bin",
+    "uploadedAt": "2025-04-23T05:59:20.666Z"
+  },
+  {
+    "version": "v5.6.1",
+    "description": "Thay đổi firmware",
+    "fileName": "firmware-v0.bin",
+    "uploadedAt": "2025-04-23T06:03:28.568Z"
+  },
+  {
+    "version": "v5.6.7",
+    "description": "update state machine",
+    "fileName": "firmware-v0.bin",
+    "uploadedAt": "2025-04-23T07:54:25.309Z"
+  },
+  {
+    "version": "v.1.2.9",
+    "description": "mới nhất",
+    "fileName": "firmware-v0.bin",
+    "uploadedAt": "2025-04-23T08:01:45.859Z"
   }
 ]

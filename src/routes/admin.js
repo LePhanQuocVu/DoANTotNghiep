@@ -38,5 +38,6 @@ adminRouter.get('/api/getHistory/:id/monthly', waterController.getDataMonthly);
 /** UPLOAD FIRMWARE\ */
 
 adminRouter.post('/api/uploadFirmware', upload.single('firmware'), AdminController.uploadFirmWare);
+adminRouter.get('/api/getAllFirmwares', AdminController.getAllFirmwares);
 
 module.exports = adminRouter;

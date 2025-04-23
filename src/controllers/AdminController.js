@@ -91,12 +91,29 @@ class AdminController {
             await newFirmware.save();
             return res.status(200).json({
                 msg: 'File uploaded and saved to DB successfully!',
-                file: fileNameSaveToDBS
+                newFirmware
             });
             // return res.status(200).json({ msg: 'Firmware uploaded successfully!', version });
         } catch (err) {
             console.error('Upload failed:', err);
             return res.status(500).json({ msg: 'Failed to save firmware.' });
+        }
+    }
+
+    getAllFirmwares = async(req,res) =>{
+        try {
+            const firmWares = await FirmwareModel.find().sort({ createdAt: -1 });
+                // Kiểm tra xem có dữ liệu không
+            if (!firmWares || firmWares.length === 0) {
+                return res.status(400).json({ msg: "No firmware data found" });
+            }
+        
+            // Trả về dữ liệu nếu thành công
+            res.status(200).json({ msg: "Get firmware success", firmWares });
+        
+        } catch(error) {
+            console.log('Error get Firware: ', error);
+            res.status(500).json({msg: "Erro from server"});
         }
     }
 
