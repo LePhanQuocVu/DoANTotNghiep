@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/UserModel');
 const Notification = require('../models/NotificationModel');
+const FirmwareModel = require('../models/FirmwareModel');
 const { getMessaging } = require('firebase-admin/messaging');
 const { messaging } = require('firebase-admin');
 
@@ -84,7 +85,7 @@ class UserController {
             //     const userToken = await User.findById(user_id).select('fcmToken');// laytoken tu device
                 const userToken = user.fcmToken;
                 console.log('FCM token get from user to push notify: '  + userToken); 
-                await sendNotification(userToken, "Thông báo", "Dang nhap thành công!");
+                await sendNotification(userToken, "Thông báo", "Đăng nhập thành công!");
              res.status(200).json({token, ...user._doc});
            // res.json({token, ...user._doc});
 
@@ -193,7 +194,25 @@ class UserController {
             return res.status(500).json({ msg: "Lỗi server", error: error.message });
         }
         
- 
+    }
+
+    getLatestFirmware = async(req, res) => {
+        try {
+            // Tìm firmware mới nhất dựa trên updatedAt giảm dần
+            const latestFirmware = await FirmwareModel.findOne().sort({ updatedAt: -1 });
+    
+            if (!latestFirmware) {
+                return res.status(404).json({ msg: "No firmware found." });
+            }
+    
+            res.status(200).json({
+                msg: "Get latest firmware success",
+                firmware: latestFirmware
+            });
+        } catch (error) {
+            console.error('Error getting latest firmware:', error);
+            res.status(500).json({ msg: "Server error." });
+        }
     }
    
   

@@ -22,4 +22,9 @@ userRouter.put("/api/:userId/updateFcmToken", UserController.updateFcmToken);
 
 userRouter.get("/api/getAllNotifications/:userId", UserController.getAllNotifications);
 
+//** UPLOAD FIRMWARE */
+
+userRouter.get("/api/latestFirmware", UserController.getLatestFirmware);
+
+
 module.exports = userRouter;
