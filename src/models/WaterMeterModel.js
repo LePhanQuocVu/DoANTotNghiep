@@ -11,7 +11,7 @@ const deviceSchema = new Schema({
     },
     location: { type: String, required: true},
     deviceType: {type: String, required: true},
-    status: {type: Boolean, default: true}, // trang thai lap dat thiet bi
+    status: {type: Boolean, default: true}, // new device setup
     bateryLevel: {type: Number, default: 100}, // 100% batery
     longitude: { type: String, required: true},
     latitude: { type: String, required: true},
@@ -23,7 +23,7 @@ const deviceSchema = new Schema({
                 timestamp: { type: Date, default: Date.now },
                 _id: false,        }
         ],
-        default: [], // Mặc định là mảng rỗng
+        default: [], // dafault empty
     }
     }, 
     {timestamps: true}
