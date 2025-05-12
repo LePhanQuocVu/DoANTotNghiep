@@ -10,11 +10,11 @@ async function sendNotification(fcmToken, title, body)  {
     }
     getMessaging().send(message)
     .then((res) => {
-        console.log('✅ Gửi thông báo thành công:', res);
+        console.log('Gửi thông báo thành công:', res);
         return res;
     })
     .catch((error) => { 
-        console.error('❌ Gửi thông báo thất bại:', error);
+        console.error('Gửi thông báo thất bại:', error);
         throw error;
     })
 }
