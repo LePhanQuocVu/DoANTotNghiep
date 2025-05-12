@@ -88,6 +88,7 @@ class AdminController {
                 fileName: fileNameSaveToDBS
             })
 
+            
             await newFirmware.save();
             return res.status(200).json({
                 msg: 'File uploaded and saved to DB successfully!',

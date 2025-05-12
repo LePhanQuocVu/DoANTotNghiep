@@ -31,7 +31,7 @@ class CoreIOTClient {
         res.on('end', () => {
             if (!this.isConnected) {
                 this.isConnected = true;
-                console.log('✅ Đã thiết lập kết nối với CoreIOT.');
+                console.log('Đã thiết lập kết nối với CoreIOT.');
             }
             if (res.statusCode == 200) {
                 console.log('Dữ liệu đã được gửi thành công đến CoreIOT.');

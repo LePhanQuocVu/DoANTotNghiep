@@ -88,9 +88,6 @@ class WaterController {
     getDeviceByUserId = async(req, res) => {
         try{
             const user_id = req.params.id;
-            console.log(req.params);
-            console.log(user_id);
-
             if(!user_id) {
                 return res.status(400).json({msg: "Người dùng chưa cài đặt!"})
             }
@@ -214,7 +211,7 @@ class WaterController {
             return res.status(200).json({totalAllDays,data: formattedResult});
            
         } catch(e) {
-            console.error("❌ Lỗi lấy dữ liệu:", e);
+            console.error(" Lỗi lấy dữ liệu:", e);
             res.status(500).json({ error: "Lỗi server!" });
         }
     }
@@ -270,7 +267,7 @@ class WaterController {
        return res.status(200).json({ totalAllDays, data: formattedResult });
 
         } catch (error) {
-            console.error("❌ Lỗi lấy dữ liệu tuần:", error);
+            console.error(" Lỗi lấy dữ liệu tuần:", error);
             res.status(500).json({ error: "Lỗi server!" });
         }
     }
