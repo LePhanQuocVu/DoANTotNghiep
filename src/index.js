@@ -73,23 +73,14 @@ io.on('connection', (socket) => {
     const topic = 'command';
     mqttController.publishToMQTT(topic, mode);
   });
+  socket.on('ota_update_requested', (data) => {
+    const { userId, message} = data;
+    const topic = `${userId}/ota`; 
+    console.log(`OTA update requested -> Topic: ${topic}, Message: ${message}`);
+
+    mqttController.publishToMQTT(topic, message);
+  });
 });
-
-// const req = http.request(options, res => {
-//   console.log(`✅ Status: ${res.statusCode}`);
-//   console.log('kết nối core IOT thành công!');
-//   res.on('data', d => {
-//     process.stdout.write(d);
-//   });
-// });
-
-// req.on('error', error => {
-//   console.error('❌ Lỗi gửi dữ liệu:', error);
-// });
-
-// req.write(data);
-// req.end();
-
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
