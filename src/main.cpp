@@ -54,7 +54,7 @@ AsyncWebServer   server(80);
 #define FLOW_SENSOR_PIN GPIO_NUM_2
 volatile int           pulseCount    = 0;
 volatile unsigned long lastPulseTime = 0;
-static const float     calibrationFactor = 450.0;
+static const float     calibrationFactor = 450;
 
 bool   noWaterDetected      = false;
 unsigned long noWaterStartTime = 0;
@@ -82,7 +82,8 @@ float readFlowRate() {
   int pulses = pulseCount;
   pulseCount = 0;
   interrupts();
-  float flowRate = (pulses / calibrationFactor) * 60.0;
+   float flowRate = (pulses / calibrationFactor) * 60;
+  // float flowRate = (pulses/5.5);
   total_water_weekly += flowRate;
   meterReading += pulses;
 //   Serial.printf("[Read] flowRate=%.2f L/min, pulses=%d\n", flowRate, pulses);
@@ -161,7 +162,6 @@ void printWakeUpReason() {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial);
   printWakeUpReason();
   configTime(0,0,"pool.ntp.org","time.nist.gov");
   if (!SPIFFS.begin(true)) Serial.println("[SPIFFS] mount failed");
@@ -197,12 +197,12 @@ void loop() {
     handleNoWaterSleepMode(lastMeasuredFlowRate);
   }
   // 10m update monthly
-  if (now - lastMeterTime >= 600000) { lastMeterTime = now; updateMonthlyTotal(); }
+  if (now - lastMeterTime >= 4000) { lastMeterTime = now; updateMonthlyTotal(); }
   // 15s publish data
-  if (now - lastPublishTime >= 15000) {
+  if (now - lastPublishTime >= 10000) {
     lastPublishTime = now;
     if (client.connected()) {
-      String topic = "data/" + id_new;
+      String topic = "datawater/" + id_new;
       Serial.println(topic);
       String json = String("{\"flowRate\":") + String(lastMeasuredFlowRate,2)
                    + ",\"volume\":" + String(lastIntervalVolume,2)

@@ -13,12 +13,12 @@ extern const char*  mqtt_password;
 extern String       id_new;
 
 // URL firmware OTA
-static const char* OTA_URL = "http://192.168.115.101:3000/firmware-v0.bin";
+static const char* OTA_URL = "http://192.168.43.171:3000/firmwares/firmware-v0.bin";
 
 // Đăng ký subscribe cho các sub‑topic của /data/<id_new>/
 static void subscribeDeviceTopics() {
     if (id_new.length() == 0) return;
-    String base = "/data/" + id_new + "/";
+    String base = "data/" + id_new + "/";
 
     String cmdTopic = base + "command";
     client.subscribe(cmdTopic.c_str());
@@ -38,7 +38,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.printf("MQTT >> topic: %s, payload: %s\n",
                   receivedTopic.c_str(), messageValue.c_str());
 
-    const String prefix = "/data/" + id_new + "/";
+    const String prefix = "data/" + id_new + "/";
     if (receivedTopic.startsWith(prefix)) {
         String sub = receivedTopic.substring(prefix.length());
 

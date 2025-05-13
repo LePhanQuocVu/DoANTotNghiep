@@ -204,7 +204,7 @@ void disableAccessPoint()
 // --------------------------------
 void enableLAN()
 {
-    Serial.println("LAN Mode");
+    // Serial.println("LAN Mode");
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(200, "text/html",
                               "<html><body><h2>Connect to WiFi - LAN Mode</h2>"
