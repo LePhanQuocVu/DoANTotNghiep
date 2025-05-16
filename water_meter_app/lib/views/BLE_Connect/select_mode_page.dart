@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:water_meter_app/providers/user_provider.dart';
 import 'package:water_meter_app/services/socket_constant.dart';
 import 'package:water_meter_app/views/BLE_Connect/access_point_page.dart';
 import 'package:water_meter_app/views/BLE_Connect/scan_device_page.dart';
@@ -12,10 +14,14 @@ class SelectModePage extends StatefulWidget {
 
 class _SelectModePageState extends State<SelectModePage> {
   late IO.Socket socket;
+  late UserProvider userProvider;
+  var userId;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userId = userProvider.user.id;
     connectToSocket();
   }
   void connectToSocket(){
@@ -38,8 +44,11 @@ class _SelectModePageState extends State<SelectModePage> {
     });
   } 
   void sendMode(String mode) {
-        socket.emit('mode_selected', mode); // Gửi sự kiện 'mode_selected' với chế độ
-        print('Send mode to server: $mode');
+     final String message = 'data/$userId/$mode'; // Tạo chuỗi theo định dạng mong muốn
+      socket.emit('mode_selected', message); // Gửi đến server qua socket
+      print('Send mode to server: $message');
+        // socket.emit('mode_selected', mode); // Gửi sự kiện 'mode_selected' với chế độ
+        // print('Send mode to server: $mode');
   }
   void _showModeSelector(BuildContext context) {
     showModalBottomSheet(
@@ -167,25 +176,30 @@ class _SelectModePageState extends State<SelectModePage> {
         ),
       ),
       body: Center(
-      child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            fixedSize: const Size(200, 200),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 20,),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(200, 70),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                backgroundColor: const Color.fromARGB(255, 98, 99, 100),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => _showModeSelector(context),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 10),
+                  Text("Lựa chọn kết nối", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
-            backgroundColor: Colors.blueAccent,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () => _showModeSelector(context),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.settings, size: 60),
-              SizedBox(height: 10),
-              Text("Select Mode", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
+          ],
+        )
       )
     );
   }

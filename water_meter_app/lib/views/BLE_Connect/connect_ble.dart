@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:water_meter_app/providers/user_provider.dart';
 import '../../utils/snackbar.dart';
 
 import 'dart:async';
@@ -18,22 +20,25 @@ class _ConnectBleState extends State<ConnectBle> {
 
   List<int> _value = [];
   String _decodedValue = "";
-  
+  String userId = "";
   late StreamSubscription<List<int>> _lastValueSubscription;
 
-
+  late UserProvider userProvider;
 
     // Text controllers for SSID and Password
   TextEditingController ssidController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
+  
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userId = userProvider.user.id;
+    
     // _lastValueSubscription = widget.characteristic.lastValueStream.listen((value) {
-      // _value = value;
-      // _decodedValue = _decodeBytesToString(_value);
+    //   _value = value;
+    //   _decodedValue = _decodeBytesToString(_value);
     //   if (mounted) {
     //     setState(() {});
     //   }
@@ -47,7 +52,9 @@ class _ConnectBleState extends State<ConnectBle> {
   List<int> _convertInputToBytes() {
     String ssid = ssidController.text;
     String password = passwordController.text;
-    String data = "ssid:$ssid,psw:$password"; // Format: ssid:<value>,psw:<value>
+    String id = userId;
+    String data = "ssid:$ssid,psw:$password,id:$id"; // Format: ssid:<value>,psw:<value>,userId:<value>
+    print('send data: '+data);
     return utf8.encode(data); // Convert the formatted string into a list of bytes
   }
 
