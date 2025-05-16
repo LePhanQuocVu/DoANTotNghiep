@@ -43,6 +43,7 @@ class _HistoryPageState extends State<HistoryPage> {
     userProvider = Provider.of<UserProvider>(context);
     deviceProvider = Provider.of<DeviceProvider>(context);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70), // Chỉ định chiều cao cho AppBar
         child: ClipRRect(
@@ -172,15 +173,14 @@ class _ChartHistoryState extends State<ChartHistory> {
       print('nhận được từ socket: ${userProvider.user.id}');
       socket.on('mqtt_data/${userProvider.user.id}', (data) {
         print('Dữ liệu nhận được: $data'); // Kiểm tra xem có nhận được dữ liệu không
-        
+        print('Data: ${data['flowRate']}');
         DateTime now = DateTime.now();
         final timestamp = DateTime.now().millisecondsSinceEpoch.toDouble();
-        final value = double.tryParse(data['data']) ?? 0;
-
+        final value = double.tryParse(data['flowRate']?.toString() ?? '') ?? 0;
         print(now.hour.toString() + ":" + now.minute.toString() + ":" + now.second.toString());
         print(value);
         setState(() {
-          currentFlowRate = data['data'].toString();
+          currentFlowRate = data['flowRate'].toString();
           dataPoints.add(FlSpot(timestamp, value));
          // deviceProviderupdateFlowRate(currentFlowRate);
           if (dataPoints.length > 10) {
@@ -559,7 +559,7 @@ class _RealTimeHistoryState extends State<RealTimeHistory> {
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     return Container(
-      height: 500,
+      height: 550,
       child: Column(
          children: [
           const Row(
@@ -619,11 +619,18 @@ class _RealTimeHistoryState extends State<RealTimeHistory> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Tổng lưu lượng: '),
-              SizedBox(width: 10,),
-              Text('${totalFlow}'),
+              const Text('Tổng lưu lượng: ',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold
+              ),),
+              const SizedBox(width: 10,),
+              Text('${totalFlow}',
+              style: TextStyle(
+                fontSize: 20
+              ),),
               SizedBox(width: 4,),
-              Text('m^3')
+              Text(' m³')
             ],
           ),
           SizedBox(

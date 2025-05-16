@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:water_meter_app/services/auth_services.dart';
@@ -20,6 +21,23 @@ class _LoginPageState extends State<LoginPage> {
 
   final _formkey = GlobalKey<FormState>();
 
+
+  @override
+  void initState() {
+    super.initState();
+    _subscribeToFirmwareUpdates();
+  }
+
+  void _subscribeToFirmwareUpdates() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    try{
+      await messaging.subscribeToTopic('firmware-updates');
+      print("Subcirble firmware updates");
+
+    } catch (e) {
+      print('fail to subcribe: ${e}');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     

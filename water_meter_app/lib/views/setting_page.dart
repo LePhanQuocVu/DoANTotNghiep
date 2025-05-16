@@ -7,6 +7,7 @@ import 'package:water_meter_app/views/change_theme_page.dart';
 import 'package:water_meter_app/views/login_page.dart';
 import 'package:water_meter_app/views/logout_page.dart';
 import 'package:water_meter_app/views/notification_page.dart';
+import 'package:water_meter_app/views/ota_update.dart';
 import 'package:water_meter_app/views/picker_page.dart';
 import 'package:water_meter_app/views/profile_page.dart';
 import 'package:water_meter_app/views/takePicture_page.dart';
@@ -26,7 +27,7 @@ class _SettingPageState extends State<SettingPage> {
   final List<String> menuItems = [
     'Thông tin người dùng',
     'Cảnh báo',
-    'Cập nhật hóa đơn',   
+    'Cập nhật Firmware',   
     'Change Theme',
     'Đăng xuất',
   ];
@@ -34,7 +35,7 @@ class _SettingPageState extends State<SettingPage> {
   List<IconData> menuIcons = [
     Icons.person_2_outlined, // Icon cho mục 1
     Icons.notification_add_rounded, // Icon cho mục 2
-    Icons.payment,
+    Icons.cloud_download,
     Icons.color_lens,
     Icons.logout,
 ];
@@ -42,7 +43,7 @@ class _SettingPageState extends State<SettingPage> {
   final List<Widget> _pages = [
     ProfilePage(),
     UpdateInforPage(),
-    PickerPage(),
+    GetLatestFirmwareScreen(),
     ProfilePage(),
     LoginPage(),
   ];
@@ -51,7 +52,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70), // Chỉ định chiều cao cho AppBar
+        preferredSize: const Size.fromHeight(70), // Chỉ định chiều cao cho AppBar
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(20), // Bo góc dưới bên trái
@@ -63,7 +64,7 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             const Icon(
               Icons.settings, // Biểu tượng giọt nước
-              color: Color.fromARGB(255, 22, 23, 23),
+              color: Color.fromARGB(255, 10, 81, 204),
               size: 50,
             ),
             const SizedBox(width: 10),

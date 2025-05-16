@@ -61,4 +61,15 @@ class UserServices {
           );
     } 
   }
+  void getAllNotifications ({
+    required String userId
+  }) async{
+    final url = Uri.parse('${ApiConstant.baseUrl}/user/api/getAllNotifications/${userId}');
+    final res = await http.get(url); 
+    
+  }
+  void getLatestFirmware() async {
+    final url = Uri.parse('${ApiConstant}/user/getLatestFirmware');
+    final res = await http.get(url);
+  }
 }

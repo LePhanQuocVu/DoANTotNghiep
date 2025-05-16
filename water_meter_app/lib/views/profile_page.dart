@@ -16,13 +16,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool _isEditing = false; // Điều khiển việc hiển thị animation để chỉnh sửa thông tin
 
-  // Test display infor
-
-  // String name = "Nguyễn Văn A";
-  // String email = "nguyen@example.com";
-  // String phone = "0123456789";
-  // String address = "Hà Nội, Việt Nam";
-
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;

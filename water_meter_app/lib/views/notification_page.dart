@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:water_meter_app/providers/user_provider.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:water_meter_app/services/api_constant.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
@@ -12,37 +15,29 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
- 
-  @override
-  void initState() {
-    super.initState();
-    getDeviceToken();
-  }
-
-  void getDeviceToken() async {
-    final notificationSettings = await FirebaseMessaging.instance.requestPermission(provisional: true);
-
-    // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    if (apnsToken != null) {
-    // APNS token is available, make FCM plugin API requests...
-      print('APNS token: ${apnsToken}');
-    }
-    // Send this token to your backend
-
-    FirebaseMessaging.instance.onTokenRefresh
-    .listen((fcmToken) {
-      // TODO: If necessary send token to application server.
-
-      // Note: This callback is fired at each app startup and whenever a new
-      // token is generated.
-    })
-    .onError((err) {
-      // Error getting token.
-    });
-    await FirebaseMessaging.instance.setAutoInitEnabled(true);
-  }
   
+  late UserProvider userProvider;
+  @override
+  initState() {
+    super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    getAllNotifications(userProvider.user.id);
+  }
+
+  // late List<dynamic<String,String>> notifications = [];
+
+  Future<void> getAllNotifications(String userId) async {
+     final url = Uri.parse('${ApiConstant.baseUrl}/user/api/getAllNotifications/${userId}');
+    final res = await http.get(url); 
+    if(res.statusCode == 200) {
+      final jsonResponse = jsonDecode(res.body);
+      print('Tất cả thông báo: ${jsonResponse}');
+      setState(() {
+        // notifications = jsonResponse['notifications'];
+      });
+    } 
+  }
+
  
   @override
   Widget build(BuildContext context) {
@@ -62,8 +57,8 @@ class _NotificationPageState extends State<NotificationPage> {
         "UserId": "Vũ",
         "title": "Cảnh báo",
         "icone": Icons.warning,
-        "description": "Xuất hiện rò rỉ nước",
-        "date": "12/12/2024",
+        "description": "Mực nước trong ngày vượt 50 m³",
+        "date": "26/03/2024",
         "time" : "12:3",
         "type": "Cảnh báo"
       }

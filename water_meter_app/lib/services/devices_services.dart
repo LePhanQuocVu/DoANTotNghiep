@@ -15,6 +15,7 @@ class DevicesServices {
   required String type,
   required String longitude,
   required String latitude,
+  String? iotToken,
   }) async{
     try {
       final device = Provider.of<DeviceProvider>(context, listen: false);
@@ -25,18 +26,20 @@ class DevicesServices {
         'deviceType': type,
         'longitude': longitude,
         'latitude': latitude,
+        'iotToken': iotToken
       })}");
       final res = await http.post(
         url,
          headers: <String, String>{
          'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String,String> {
+        body: jsonEncode(<String,dynamic> {
           'user_id': user_id,
           'location': location,
           'deviceType': type,
           'longitude': longitude,
           'latitude': latitude,
+          'iotToken': iotToken
         }),
       );
       print('${res.body}');

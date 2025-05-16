@@ -41,6 +41,8 @@ class AuthServices {
           'Content-Type': 'application/json; charset=UTF-8'
         }
       );
+       final responseData = jsonDecode(res.body);
+      final userId = responseData['_id']; //  Lấy id từ JSON response
       
       httpErrorHandle(
       response: res,
@@ -56,6 +58,11 @@ class AuthServices {
               duration: const Duration(seconds: 2),
             )
           );
+          await NotificationService.instance.initialize();
+           print('FCM token Global: ${fcmToken}');
+          print('Update FcmToken to userId: ${userId}');
+          userServices.updateFcmToken(context: context, userId: userId, fcmToken: fcmToken);
+
           Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -111,10 +118,10 @@ class AuthServices {
               duration: const Duration(seconds: 2),
             )
           );
-           await NotificationService.instance.initialize();
-          print('FCM token Global: ${fcmToken}');
-          print('Update FcmToken to userId: ${userId}');
-          userServices.updateFcmToken(context: context, userId: userId, fcmToken: fcmToken);
+          //  await NotificationService.instance.initialize();
+          // print('FCM token Global: ${fcmToken}');
+          // print('Update FcmToken to userId: ${userId}');
+          // userServices.updateFcmToken(context: context, userId: userId, fcmToken: fcmToken);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
        }
       );

@@ -7,7 +7,9 @@ import 'package:water_meter_app/providers/user_provider.dart';
 import 'package:water_meter_app/services/api_constant.dart';
 import 'package:water_meter_app/services/devices_services.dart';
 import 'package:location/location.dart';
+import 'package:water_meter_app/views/BLE_Connect/select_mode_page.dart';
 import 'package:water_meter_app/widgets/utils.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 class InstallDevicesPage extends StatefulWidget {
   const InstallDevicesPage({super.key});
@@ -26,8 +28,8 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
   // String? deviceType;
   bool isSetup = false;
   late TextEditingController _nameController;
-  late TextEditingController _phoneController;
   late TextEditingController _emailController;
+  late TextEditingController _accessTokenController = TextEditingController();
   late TextEditingController _locationControler = TextEditingController();
   late TextEditingController _longitudeController = TextEditingController();
   late TextEditingController _latitudeController = TextEditingController();
@@ -35,6 +37,8 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
   late TextEditingController _specificLocationController = TextEditingController();
 
   late UserProvider userProvider;
+
+  int _selectedWatchType = -1;
 
   late DeviceProvider deviceProvider;
   Future<void> fetchDeviceByUserId(String userId) async {
@@ -69,7 +73,6 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
     super.initState();
      final userProvider = Provider.of<UserProvider>(context, listen: false);
      _nameController = TextEditingController(text: userProvider.user.name);
-     _phoneController = TextEditingController(text: userProvider.user.phone);
      _emailController = TextEditingController(text: userProvider.user.email);
      fetchDeviceByUserId(userProvider.user.id);
   }
@@ -78,7 +81,6 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
     // TODO: implement dispose
     super.dispose();
     _nameController.dispose();
-    _phoneController.dispose();
     _emailController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
@@ -87,8 +89,6 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
   @override
   Widget build(BuildContext context) {
     deviceProvider = Provider.of<DeviceProvider>(context);
-    // final userProvider = Provider.of<UserProvider>(context);
-   // final deviceProvider = Provider.of<DeviceProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
     final DevicesServices devicesServices = DevicesServices();
     final formKey = GlobalKey<FormState>();
@@ -156,6 +156,8 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                 context: context,
                 isScrollControlled: true,
                 builder: (BuildContext context) {
+                  // Tạo một biến state cục bộ cho modal
+                  int modalSelectedWatchType = _selectedWatchType;
                   return FractionallySizedBox(
                     heightFactor: 0.9,
                     widthFactor: 0.9,
@@ -206,6 +208,27 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                 ),
                               ),
                             ),
+                              SizedBox(height: 20,),
+                            TextFormField(
+                              enableInteractiveSelection: true,
+                              controller: _accessTokenController,
+                              decoration: InputDecoration(
+                                labelText: "Access Token",
+                                prefixIcon: const Icon(Icons.location_city_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (String? value){
+                                if(value == null || value.isEmpty){
+                                  return "Access token CoreIOT";
+                                }
+                                return null;
+                              }
+                            ),
                             SizedBox(height: 20,),
                             TextFormField(
                               controller: _locationControler,
@@ -226,6 +249,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                 return null;
                               }
                             ),
+                          
                             const SizedBox(height: 20,),
                             TextFormField(
                               controller: _specificLocationController,
@@ -255,83 +279,42 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                             ),
                             SizedBox(height: 10,),
                             Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedDeviceType = "1";
-                                        type = selectedDeviceType;
-                                        print(type);
-                                      });
-                                    },
-                                    child: Opacity(
-                                      opacity: selectedDeviceType == "2" ? 0.5 : 1.0,
-                                      child: Column(
-                                        children: [
-                                        Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: selectedDeviceType ==
-                                                        "1"
-                                                    ? Colors.blue
-                                                    : Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: 
-                                            Image.asset(
-                                              'assets/images/dhc.jpg',
-                                              fit: BoxFit.cover,), // Thay đường dẫn ảnh
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text("Đồng hồ cơ"),
-                                      ],
-                                      ),
-                                     
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedDeviceType = "2";
-                                        type = selectedDeviceType;
-                                        print(type);
-                                      });
-                                    },
-                                    child: Opacity(
-                                      opacity: selectedDeviceType == "2" ? 0.5 : 1.0,
-                                      child: Column(
-                                         children: [
-                                        Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: selectedDeviceType ==
-                                                        "2"
-                                                    ? Colors.blue
-                                                    : Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Image.asset(
-                                              'assets/images/dhch.jpg',
-                                              fit: BoxFit.cover,
-                                              ),
-                                                // Thay đường dẫn ảnh
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text("Đồng hồ điện tử"),
-                                      ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // First watch type
+                                WatchTypeSelector(
+                                  index: 0,
+                                  isSelected: _selectedWatchType == 1,
+                                  imagePath: 'assets/images/dhc.jpg',
+                                  label: 'Đồng hồ loại 1',
+                                  onTap: () {
+                                    setState(() {
+                                      print('Chọn device 1');
+                                      type = "1";
+                                      _selectedWatchType = 1;
+                                      // Tạo một biến state cục bộ cho modal
+                                      int modalSelectedWatchType = _selectedWatchType;
+                                    });
+                                  },
+                                ),
+                                
+                                // Second watch type
+                                WatchTypeSelector(
+                                  index: 1,
+                                  isSelected: _selectedWatchType == 2,
+                                  imagePath: 'assets/images/dhc.jpg',
+                                  label: 'Đồng hồ loại 2',
+                                  onTap: () {
+                                    setState(() {
+                                       print('Chọn device 2');
+                                       type = "2";
+                                      _selectedWatchType = 2;
+                                      modalSelectedWatchType = _selectedWatchType;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -340,7 +323,7 @@ class _InstallDevicesPagetate extends State<InstallDevicesPage> {
                                 onPressed: () async {
                                   //CREATE DEVICE
                                   if(formKey.currentState?.validate() ?? false) {
-                                    devicesServices.createDevice(context: context, user_id: userProvider.user.id, location: _locationControler.text, type: type.toString(), longitude: _longitudeController.text, latitude: _latitudeController.text); 
+                                    await devicesServices.createDevice(context: context, user_id: userProvider.user.id, location: _locationControler.text, type: type.toString(), longitude: _longitudeController.text, latitude: _latitudeController.text, iotToken: _accessTokenController.text); 
                                       if(mounted) {
                                         setState(() {
                                           isSetup = true;
@@ -408,7 +391,9 @@ class _DeviceInforState extends State<DeviceInfor> {
   late TextEditingController _addressController;
 
   final DevicesServices device = DevicesServices();
- 
+  
+  String? selectedDeviceType;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -428,6 +413,9 @@ class _DeviceInforState extends State<DeviceInfor> {
     String? type;
      //  String? location;
     String? selectedDeviceType;
+    
+    int _selectedWatchType = -1;
+
     final formKey = GlobalKey<FormState>();
     setState(() {
       //  device.getDeviceByUserId(userProvider.user.id);
@@ -622,7 +610,8 @@ class _DeviceInforState extends State<DeviceInfor> {
                 context: context,
                 isScrollControlled: true,
                 builder: (BuildContext context) {
-                  return FractionallySizedBox(
+                  int modalSelectedWatchType = _selectedWatchType;
+                    return FractionallySizedBox(
                     heightFactor: 0.8,
                     widthFactor: 0.9,
                     child: Form(
@@ -703,83 +692,41 @@ class _DeviceInforState extends State<DeviceInfor> {
                               ],
                             ),
                             Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedDeviceType = "1";
-                                        type = selectedDeviceType;
-                                        print(type);
-                                      });
-                                    },
-                                    child: Opacity(
-                                      opacity: selectedDeviceType == "2" ? 0.5 : 1.0,
-                                      child: Column(
-                                        children: [
-                                        Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: selectedDeviceType ==
-                                                        "1"
-                                                    ? Colors.blue
-                                                    : Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: 
-                                            Image.asset(
-                                              'assets/images/dhc.jpg',
-                                              fit: BoxFit.cover,), // Thay đường dẫn ảnh
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text("Đồng hồ cơ"),
-                                      ],
-                                      ),
-                                     
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedDeviceType = "2";
-                                        type = selectedDeviceType;
-                                        print(type);
-                                      });
-                                    },
-                                    child: Opacity(
-                                      opacity: selectedDeviceType == "2" ? 0.5 : 1.0,
-                                      child: Column(
-                                         children: [
-                                        Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: selectedDeviceType ==
-                                                        "2"
-                                                    ? Colors.blue
-                                                    : Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Image.asset(
-                                              'assets/images/dhch.jpg',
-                                              fit: BoxFit.cover,
-                                              ),
-                                                // Thay đường dẫn ảnh
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text("Đồng hồ điện tử"),
-                                      ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // First watch type
+                              WatchTypeSelector(
+                                index: 0,
+                                isSelected: _selectedWatchType == 1,
+                                imagePath: 'assets/images/dhc.jpg',
+                                label: 'Đồng hồ loại 1',
+                                onTap: () {
+                                  setState(() {
+                                     selectedDeviceType = "1";
+                                     type = "1";
+                                    _selectedWatchType = 1;
+                                    modalSelectedWatchType = _selectedWatchType;
+                                  });
+                                },
                               ),
+                              
+                              // Second watch type
+                              WatchTypeSelector(
+                                index: 1,
+                                isSelected: _selectedWatchType == 2,
+                                imagePath: 'assets/images/dhc.jpg',
+                                label: 'Đồng hồ loại 2',
+                                onTap: () {
+                                  setState(() {
+                                    selectedDeviceType = "2";
+                                    type = "2";
+                                    _selectedWatchType = 2;
+                                    modalSelectedWatchType = _selectedWatchType;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -800,8 +747,8 @@ class _DeviceInforState extends State<DeviceInfor> {
                         )
                       )
                     ),
-                  );
-                }
+                  );                
+                    }
                )
                ;
               },
@@ -815,6 +762,163 @@ class _DeviceInforState extends State<DeviceInfor> {
         )
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+
+class WatchTypeSelector extends StatefulWidget {
+  final int index;
+  final bool isSelected;
+  final String imagePath;
+  final String label;
+  final VoidCallback onTap;
+
+  const WatchTypeSelector({
+    Key? key,
+    required this.index,
+    required this.isSelected,
+    required this.imagePath,
+    required this.label,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  State<WatchTypeSelector> createState() => _WatchTypeSelectorState();
+}
+
+class _WatchTypeSelectorState extends State<WatchTypeSelector> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(WatchTypeSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected != oldWidget.isSelected) {
+      if (widget.isSelected) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Kích thước cơ bản của container
+    final double baseSize = 120;
+    
+    return GestureDetector(
+      onTap: () {
+        // Thêm hiệu ứng phản hồi khi chạm
+        HapticFeedback.lightImpact();
+        widget.onTap();
+      },
+      child: Column(
+        children: [
+          AnimatedBuilder(
+            animation: _scaleAnimation,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: widget.isSelected ? _scaleAnimation.value : 1.0,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  width: widget.isSelected ? baseSize * 1.1 : baseSize,
+                  height: widget.isSelected ? baseSize * 1.1 : baseSize,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: widget.isSelected ? Colors.blue : Colors.grey,
+                      width: widget.isSelected ? 3 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: widget.isSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.3),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(
+                            widget.imagePath,
+                            fit: BoxFit.cover,
+                            // Nếu không có hình ảnh thực tế, bạn có thể sử dụng placeholder
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey.shade200,
+                                child: Center(
+                                  child: Text(
+                                    'Đồng hồ ${widget.index + 1}',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      if (widget.isSelected)
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 300),
+            style: TextStyle(
+              fontSize: widget.isSelected ? 16 : 14,
+              fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+              color: widget.isSelected ? Colors.blue : Colors.black,
+            ),
+            child: Text(widget.label),
+          ),
+        ],
       ),
     );
   }
