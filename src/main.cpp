@@ -197,7 +197,21 @@ void loop() {
     handleNoWaterSleepMode(lastMeasuredFlowRate);
   }
   // 10m update monthly
-  if (now - lastMeterTime >= 4000) { lastMeterTime = now; updateMonthlyTotal(); }
+  if (now - lastMeterTime >= 5000)
+    {
+      lastMeterTime = now;
+      updateMonthlyTotal();
+      if (!isWifiConnected || !client.connected())
+      {
+        String flowRate = "0";
+        String logLine = String("{\"flowRate\":") + flowRate
+                   + ",\"volume\":" + String(lastIntervalVolume,2)
+                   + ",\"total_monthly\":" + String(total_water_monthly,2)
+                   + "}";
+
+        saveDataToSPIFFS(logLine);
+      }
+    }
   // 15s publish data
   if (now - lastPublishTime >= 10000) {
     lastPublishTime = now;

@@ -10,7 +10,7 @@ extern bool apEnabled;
 extern bool isWifiConnected;
 extern String ssid_new, password_new;
 extern State currentState;
-
+extern String id_new;
 // MQTT extern
 extern PubSubClient client;
 
@@ -272,36 +272,45 @@ void saveDataToSPIFFS(const String &data)
     }
     file.close();
 }
-
 bool sendSavedDataToMQTT()
 {
     static File file = SPIFFS.open("/data.log", FILE_READ);
+
     if (!file)
     {
-        Serial.println("Failed to open file for reading");
+        Serial.println("[MQTT] Failed to open /data.log for reading");
         return false;
     }
+
     if (!file.available())
     {
-        Serial.println("No more data in flash to send.");
+        Serial.println("[MQTT] No more data to send, deleting log...");
         file.close();
         SPIFFS.remove("/data.log");
         return false;
     }
+
     String line = file.readStringUntil('\n');
-    if (line.length() > 0)
+    line.trim(); // bỏ ký tự xuống dòng nếu có
+
+    if (line.length() > 0 && client.connected())
     {
-        if (client.publish("datawater", line.c_str()))
+        String topic = "datawater/" + id_new;
+        Serial.println("[MQTT] Sending to topic: " + topic);
+        Serial.println("[MQTT] Payload: " + line);
+
+        if (client.publish(topic.c_str(), line.c_str()))
         {
-            Serial.println("Sent flash data: " + line);
+            Serial.println("[MQTT] Sent flash data OK");
         }
         else
         {
-            Serial.println("Failed to send flash data: " + line);
+            Serial.println("[MQTT] Failed to send flash data");
             file.close();
             return false;
         }
     }
+
     return true;
 }
 
