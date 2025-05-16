@@ -14,6 +14,7 @@ class Devices {
   // final String deviceName;
   final String longitude;
   final String latitude;
+  final String? iotToken;
   final DateTime? create_at;
   final DateTime? update_at;
   
@@ -28,6 +29,7 @@ class Devices {
     required this.latitude,
     // this.image,
     // required this.deviceName,
+    this.iotToken,
     this.create_at,
     this.update_at,
   });
@@ -42,6 +44,7 @@ class Devices {
       'bateryLevel': bateryLevel,
       'longitude': longitude,
       'latitude': latitude,
+      'iotToken': iotToken,
       'create_at': create_at,
       'update_at': update_at
     };
@@ -59,6 +62,7 @@ class Devices {
       bateryLevel: map['bateryLevel'] != null ? map['bateryLevel'] as int : null, // Kiểm tra null
       longitude: map['longitude'] != null ? map['longitude']  as String : '',
       latitude: map['latitude'] != null ? map['latitude'] as String : '',
+      iotToken: map['iotToken'] != null ? map['iotToken'] as String : null,
       create_at: map['create_at'] != null
             ? DateTime.parse(map['create_at'] as String)
             : null, // Chuyển đổi chuỗi ngày giờ thành DateTime
