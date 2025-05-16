@@ -183,7 +183,7 @@ void setup() {
   client.setCallback(mqttCallback);
   Serial.println("[Setup] BLE mode");
   initBLE();
-  clearWiFiCredentials();
+  // clearWiFiCredentials();
   currentState = KET_NOI_WIFI;
 }
 

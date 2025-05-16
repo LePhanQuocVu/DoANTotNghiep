@@ -171,10 +171,13 @@ void enableAccessPoint()
             {
                 ssid     = request->getParam("ssid", true)->value();
                 password = request->getParam("password", true)->value();
+                 Serial.printf("Đã kết nối Wifi mới: SSID = %s, Password: %s\n", ssid.c_str(), password.c_str());
+
             }
 
             if (!ssid.isEmpty() && !password.isEmpty())
             {
+                 Serial.printf("Đã kết nối Wifi mới: SSID = %s, Password: %s\n", ssid.c_str(), password.c_str());
                 ssid_new     = ssid;
                 password_new = password;
                 disableAccessPoint();
@@ -221,6 +224,7 @@ void enableLAN()
         if (request->hasParam("ssid", true) && request->hasParam("password", true)) {
             ssid     = request->getParam("ssid", true)->value();
             password = request->getParam("password", true)->value();
+             Serial.printf("Đã kết nối Wifi mới: SSID = %s, Password: %s\n", ssid.c_str(), password.c_str());
         }
         if (!ssid.isEmpty() && !password.isEmpty()) {
             ssid_new     = ssid;
