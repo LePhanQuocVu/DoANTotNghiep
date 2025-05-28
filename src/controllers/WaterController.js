@@ -7,8 +7,8 @@ const { sendNotification } = require('../helper/sendNotify');
 const { hashToken } = require('../helper/hashAccessToken');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const CoreIOTClient = require('../controllers/CoreIotController');
-let coreIOTClientInstance = null;
+// const CoreIOTClient = require('../controllers/CoreIotController');
+// let coreIOTClientInstance = null;
 class WaterController {
     
     createDevice = async(req, res) => {
@@ -22,8 +22,6 @@ class WaterController {
                 return res.status(400).json({msg: "User đã cài đặt thiết bị!"});
             }
 
-            // const hashedToken = await hashToken(iotToken);
-            // create waterDevice
             const newDevice = new WaterMeter({
                 deviceType: deviceType, // loại đồng hồ
                 user_id: user_id, // Lấy user_id từ req.body
@@ -36,7 +34,7 @@ class WaterController {
 
             // // connect to CoreIOT
             // coreIOTClientInstance = new CoreIOTClient(iotToken);
-            console.log(`CorreIOT Instance: ${coreIOTClientInstance}`);
+            // console.log(`CorreIOT Instance: ${coreIOTClientInstance}`);
             const waterDevice = await newDevice.save();
             if(!waterDevice) {
                 return res.status(400).json({msg: "Không thể tạo thiết bị!"});
@@ -103,36 +101,35 @@ class WaterController {
         }
     }
 
-    updateDevice = async(req, res) => {
-        try {
-            const deviceId = req.params.id;
-            console.log(deviceId);
-            const {deviceType, location, status, longitude, latitude} = req.body;
-            const device =  await WaterMeter.findById(deviceId).select('-data');
-            if(!device) {
-                return res.status(400).json({msg: "Device not exit"});
-            }
+    updateDevice = async (req, res) => {
+    try {
+        const deviceId = req.params.id;
+        console.log("Updating device ID:", deviceId);
 
-            //update information
-            device.deviceType = deviceType || device.deviceType;
-            device.status = status || device.status;
-            device.location = location || device.location;
-            device.status = status || device.status;
-            device.longitude = longitude || device.longitude;
-            device.latitude = latitude || device.latitude;
+        const { deviceType, location, status, longitude, latitude, iotToken } = req.body;
 
-            const deviceUpdated = await device.save();
-            
-            if(!deviceUpdated) {
-                return res.status(404).json({msg: "Not updated"});
-            }
-            return res.status(200).json(deviceUpdated);
+        const device = await WaterMeter.findById(deviceId).select('-data');
+        if (!device) {
+            return res.status(404).json({ msg: "Device không tồn tại" });
         }
-        catch (e){
-            console.log(`Loi update device: ${e}`);
-            return res.status(500).json({error: e.message});
-        }
+
+        if (deviceType !== undefined) device.deviceType = deviceType;
+        if (status !== undefined) device.status = status;
+        if (location !== undefined) device.location = location;
+        if (longitude !== undefined) device.longitude = longitude;
+        if (latitude !== undefined) device.latitude = latitude;
+        if (iotToken !== undefined) device.iotToken = iotToken;
+
+        const deviceUpdated = await device.save();
+
+        return res.status(200).json(deviceUpdated);
+
+    } catch (e) {
+        console.error(`Lỗi update device: ${e}`);
+        return res.status(500).json({ error: e.message });
     }
+}
+
 
     deleteDevice = async (req,res) => {
         try {

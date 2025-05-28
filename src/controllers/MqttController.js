@@ -65,6 +65,7 @@ class MqttController {
         // save to database
           const device = await WaterMeter.findOne({ user_id: userId });
           const deviceJson = (device);
+          console.log(`Device to puh: ${deviceJson}`);
           var token = device['iotToken'];
           console.log(`Token: ${token}`); // -> trả về token của userID
           if (!device) {

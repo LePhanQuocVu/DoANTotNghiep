@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const accessToken = '6mT5gue0VvOMQv6B1biX'; // Thay bằng token của thiết bị thật
-
+const path = require('path');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const waterRouter = require('./routes/water');
@@ -56,6 +56,7 @@ app.use('/water', waterRouter);
 // // Thiết lập các route cho Admin
 app.use('/admin',adminRouter);
 
+app.use('/firmwares', express.static(path.join(__dirname, 'firmwares')));
 // Test route cho socket.io
 app.use('/', (req, res) => {
   res.send('<h1>Test Socket.IO server</h1>');
@@ -68,14 +69,21 @@ mqttController.initialize(io);
 // Socket.IO event handler//
 io.on('connection', (socket) => {
   console.log('A user connected');
-  socket.on('mode_selected', (mode) => {
-    console.log(`Received mode from Flutter: ${mode}`);
-    const topic = 'command';
+  socket.on('mode_selected', (message) => {
+      console.log(`Received mode from Flutter: ${message}`);
+    // Parse message to get userId and command
+    const parts = message.split('/');
+    const userId = parts[1];
+    const mode = parts[2];
+    
+    const topic = `data/${userId}/command`;  // dynamic topic
     mqttController.publishToMQTT(topic, mode);
+    console.log(`Public to Esp32 topic: ${topic}`);
+    console.log(`Public to Esp32 message: ${mode}`);
   });
   socket.on('ota_update_requested', (data) => {
     const { userId, message} = data;
-    const topic = `${userId}/ota`; 
+    const topic = `data/${userId}/ota`; 
     console.log(`OTA update requested -> Topic: ${topic}, Message: ${message}`);
 
     mqttController.publishToMQTT(topic, message);

@@ -80,15 +80,10 @@ class UserController {
             }
 
             const token = jwt.sign({id: user._id}, "passwordKey");
-
-            //  // send tofication to FCM 
-            //     const userToken = await User.findById(user_id).select('fcmToken');// laytoken tu device
-                const userToken = user.fcmToken;
-                console.log('FCM token get from user to push notify: '  + userToken); 
-                await sendNotification(userToken, "Thông báo", "Đăng nhập thành công!");
+            const userToken = user.fcmToken;
+            console.log('FCM token get from user to push notify: '  + userToken); 
+            await sendNotification(userToken, "Thông báo", "Đăng nhập thành công!");
              res.status(200).json({token, ...user._doc});
-           // res.json({token, ...user._doc});
-
         }catch(e) {
             res.status(500).json({error: e.message});
         }
@@ -139,14 +134,6 @@ class UserController {
             res.status(500).json({ error: e.message });
         }
     }
-
-    // updateFirmware = async () => {
-    //     try{
-            
-    //     } catch (e) {
-    //         res.status(500).json({ error: e.message});
-    //     }
-    // }
 
     updateFcmToken = async (req,res) => {
         const objectId = new mongoose.Types.ObjectId(req.params.userId);

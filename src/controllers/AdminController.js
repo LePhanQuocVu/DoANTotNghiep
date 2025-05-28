@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const User = require('../models/UserModel');
 const FirmwareModel = require('../models/FirmwareModel');
+const { sendNotification, sendNotificationToTopic } = require('../helper/sendNotify');
 
 class AdminController {
     login = async(req,res) =>{
@@ -88,8 +89,13 @@ class AdminController {
                 fileName: fileNameSaveToDBS
             })
 
-            
             await newFirmware.save();
+            // try {
+            //     await sendNotificationToTopic('firmware-updates', `Firmware v${version} đã được cập nhật`, description);
+            // } catch (err) {
+            // console.error('Failed to send notification:', err);
+            // // Có thể chọn không trả lỗi để upload firmware không bị ảnh hưởng
+            // }
             return res.status(200).json({
                 msg: 'File uploaded and saved to DB successfully!',
                 newFirmware
