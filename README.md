@@ -1,11 +1,13 @@
-* Main funtion:
-      - Login/Register
-      -  Receive data from HiveMQ brokekr (Subsrible).
-      - Push data on Mobile app through Socket.IO
-      - Push data on CoreIOT platform.
-      - Receive message through MQTT
-* Technology:
+* OVERVIEW
 
+* Main funtion:
+
+  - Login/Register
+  -  Receive data from HiveMQ brokekr (Subsrible).
+  - Push data on Mobile app through Socket.IO
+  -  Push data on CoreIOT platform.
+  - Receive message through MQTT
+* Technology:
     - Language: Javascripts,
     - DataBase: MongooseDB
 * Library:
